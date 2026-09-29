@@ -1,0 +1,5 @@
+# Imágenes subidas desde el sistema (no se versionan)
+assets/img/productos/*
+!assets/img/productos/.htaccess
+assets/img/empresa/*
+!assets/img/empresa/.htaccess

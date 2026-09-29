@@ -1,0 +1,6 @@
+<?php
+define('ROL_ADMINISTRADOR', 1);
+define('ROL_VENDEDOR', 2);
+define('ROL_CAJERO', 3);
+define('ROL_SUPERVISOR', 4);
+define('CLIENTE_GENERAL_DOCUMENTO', '222222222222');

@@ -1,0 +1,5 @@
+<?php
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../helpers/auth.php';
+header('Location: ' . (isLoggedIn() ? 'dashboard.php' : 'login.php'));
+exit;
