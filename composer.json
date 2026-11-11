@@ -1,0 +1,13 @@
+{
+    "name": "amilo516/sistema-ventas",
+    "description": "Sistema de Ventas en PHP + MySQL con Asesor IA",
+    "type": "project",
+    "require": {
+        "php": "^8.1",
+        "anthropic-ai/sdk": "^0.57",
+        "guzzlehttp/guzzle": "^7"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
