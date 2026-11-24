@@ -40,7 +40,7 @@ y comprueba que FALLA antes de implementar.
 
 **⚠️ CRITICAL**: Ninguna historia puede empezar hasta completar esta fase
 
-- [ ] T005 Hacer que config/database.php lea el nombre de la base con `getenv('DB_NAME') ?: 'sistema_ventas'` (inicializado en el constructor). Sin la variable, el comportamiento web no cambia (plan.md, Constitution Check)
+- [X] T005 Hacer que config/database.php lea el nombre de la base con `getenv('DB_NAME') ?: 'sistema_ventas'` (inicializado en el constructor). Sin la variable, el comportamiento web no cambia (plan.md, Constitution Check)
 - [ ] T006 [P] Crear actualizacion_descuento_maximo.sql en la raíz, con el estilo de actualizacion_asesor_ia.sql: `USE sistema_ventas`; añadir la columna `data-model.md` Rol.descuento_maximo con `ALTER TABLE roles ADD COLUMN IF NOT EXISTS`; `UPDATE roles SET descuento_maximo = 100.00 WHERE id_rol = 1`; refrescar `permisos_version` con `UUID()` (research.md R6)
 - [ ] T007 [P] Actualizar database.sql: añadir `data-model.md` Rol.descuento_maximo al `CREATE TABLE roles` y fijar 100.00 para el Administrador en el `INSERT INTO roles` inicial (database.sql:474), para instalaciones nuevas
 - [ ] T008 Crear tests/Integration/BaseDatosTestCase.php (clase abstracta que extiende `PHPUnit\Framework\TestCase`): en `setUpBeforeClass()` recrea `sistema_ventas_test` desde database.sql (reemplazando el nombre de la base y su `USE`) y aborta si `getenv('DB_NAME')` no es `sistema_ventas_test`; en `setUp()` restaura los datos semilla. Expone utilidades para crear rol, usuario, cliente, producto con stock, carrito con ítems y apertura de caja, y una utilidad `iniciarSesionComo(int $idUsuario)` que llena `$_SESSION` (`id_usuario`, `rol_id`, `rol`, `permisos`, `permisos_version`). Depende de T005 y T007

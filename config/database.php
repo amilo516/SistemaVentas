@@ -8,6 +8,13 @@ class Database {
     private string $password = '';
     private ?PDO $connection = null;
 
+    // DB_NAME permite usar otra base sin tocar este archivo (las pruebas usan sistema_ventas_test).
+    // Sin la variable, se usa la base de siempre.
+    public function __construct() {
+        $nombre = getenv('DB_NAME');
+        if (is_string($nombre) && $nombre !== '') $this->dbName = $nombre;
+    }
+
     public function getConnection(): PDO {
         if ($this->connection === null) {
             $dsn = "mysql:host={$this->host};dbname={$this->dbName};charset=utf8mb4";

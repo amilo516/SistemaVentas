@@ -23,6 +23,7 @@ CREATE TABLE roles (
     id_rol INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
     descripcion VARCHAR(255) NULL,
+    descuento_maximo DECIMAL(5,2) NOT NULL DEFAULT 10.00,
     estado TINYINT(1) NOT NULL DEFAULT 1,
     fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
@@ -471,11 +472,12 @@ CREATE TABLE recomendaciones_ia (
 -- ------------------------------------------------------------
 
 -- Roles
-INSERT INTO roles (nombre, descripcion) VALUES
-('Administrador', 'Acceso completo al sistema'),
-('Vendedor', 'Realiza ventas y consulta información necesaria'),
-('Cajero', 'Gestiona caja, pagos y ventas'),
-('Supervisor', 'Supervisa ventas, inventario y reportes');
+-- descuento_maximo: el Administrador no tiene límite (100); el resto empieza en 10 %.
+INSERT INTO roles (nombre, descripcion, descuento_maximo) VALUES
+('Administrador', 'Acceso completo al sistema', 100.00),
+('Vendedor', 'Realiza ventas y consulta información necesaria', 10.00),
+('Cajero', 'Gestiona caja, pagos y ventas', 10.00),
+('Supervisor', 'Supervisa ventas, inventario y reportes', 10.00);
 
 -- Permisos
 INSERT INTO permisos (nombre, descripcion) VALUES

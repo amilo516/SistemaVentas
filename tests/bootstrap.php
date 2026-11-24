@@ -9,3 +9,6 @@ require_once __DIR__ . '/../config/constantes.php';
 // Sesión simulada: los controladores leen $_SESSION, pero en CLI no se llama a session_start().
 $_SESSION = [];
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+// Base común de las pruebas de integración (no termina en Test.php, así que PHPUnit no la ejecuta sola).
+require_once __DIR__ . '/Integration/BaseDatosTestCase.php';
