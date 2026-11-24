@@ -125,10 +125,10 @@ y comprueba que FALLA antes de implementar.
 
 **Purpose**: Cierre según los criterios de "terminado" de la constitución
 
-- [ ] T031 [P] Documentar en README.txt la aplicación de actualizacion_descuento_maximo.sql, el uso de `composer install` y la ejecución de `vendor/bin/phpunit` con la base `sistema_ventas_test`
-- [ ] T032 Revisar el cumplimiento de la constitución en los archivos modificados: SQL nuevo solo con `prepare()`/`execute()`, salida de vistas con `e()`, formularios con `verificarCsrf()`, vistas sin SQL y auditoría sin datos sensibles
-- [ ] T033 Ejecutar la suite completa `vendor/bin/phpunit` y confirmar que queda toda en verde (Principio V)
-- [ ] T034 Ejecutar la validación manual de specs/001-descuento-maximo-rol/quickstart.md (pasos 1–4) y registrar el resultado de cada caso
+- [X] T031 [P] Documentar en README.txt la aplicación de actualizacion_descuento_maximo.sql, el uso de `composer install` y la ejecución de `vendor/bin/phpunit` con la base `sistema_ventas_test`
+- [X] T032 Revisar el cumplimiento de la constitución en los archivos modificados: SQL nuevo solo con `prepare()`/`execute()`, salida de vistas con `e()`, formularios con `verificarCsrf()`, vistas sin SQL y auditoría sin datos sensibles
+- [X] T033 Ejecutar la suite completa `vendor/bin/phpunit` y confirmar que queda toda en verde (Principio V)
+- [X] T034 Ejecutar la validación manual de specs/001-descuento-maximo-rol/quickstart.md (pasos 1–4) y registrar el resultado de cada caso
 
 ---
 

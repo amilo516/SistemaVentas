@@ -39,3 +39,25 @@ ASESOR IA
 
 Cada rol ve solo los módulos de sus permisos (Roles y permisos). Los cambios de
 permisos se aplican de inmediato, sin volver a iniciar sesión.
+
+DESCUENTO MÁXIMO POR ROL
+- Cada rol tiene un porcentaje máximo de descuento (0 a 100 %, hasta dos decimales).
+  Una venta con un descuento mayor se rechaza y el intento queda en Auditoría.
+- El Administrador no tiene límite. Los demás roles empiezan en 10 % y se cambian en
+  Roles y permisos. Nadie, salvo el Administrador, puede cambiar el de su propio rol.
+- Si tu base de datos es anterior a esta funcionalidad, importa
+  actualizacion_descuento_maximo.sql en phpMyAdmin (se puede importar más de una vez).
+  Sin ese paso, la pantalla de ventas y la de roles muestran un error de base de datos.
+  En MySQL 8 (no MariaDB), quita "IF NOT EXISTS" del ALTER TABLE antes de importarlo.
+
+PRUEBAS AUTOMÁTICAS (PHPUnit)
+- Requisitos: Composer y MySQL encendido en XAMPP.
+- En la carpeta del proyecto, instala las dependencias (incluye PHPUnit):
+    composer install
+- Ejecuta las pruebas:
+    vendor/bin/phpunit                         (todas)
+    vendor/bin/phpunit --testsuite Unit        (reglas puras, no necesitan MySQL)
+    vendor/bin/phpunit --testsuite Integration (usan MySQL)
+  o bien: composer test
+- Las pruebas de integración crean y usan su propia base, sistema_ventas_test
+  (definida en phpunit.xml). Nunca tocan sistema_ventas.
