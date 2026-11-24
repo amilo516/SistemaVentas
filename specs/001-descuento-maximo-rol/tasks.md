@@ -109,13 +109,13 @@ y comprueba que FALLA antes de implementar.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T027 [P] [US3] Crear tests/Integration/AuditoriaDescuentoRechazadoTest.php (extiende BaseDatosTestCase) con los escenarios 1–3 de spec.md US3: el registro existe tras el rechazo con la descripción exacta de data-model.md (`Descuento rechazado: $15.000 (15 %) sobre subtotal $100.000. Máximo del rol Cajero: 10 %`), el `id_usuario` correcto y ninguna venta creada; dos intentos generan dos registros; no hay registro para rechazos por stock, descuento negativo o mayor que el subtotal, ni para ventas aceptadas; y si la escritura de auditoría falla, el usuario recibe igualmente el mensaje del límite
+- [X] T027 [P] [US3] Crear tests/Integration/AuditoriaDescuentoRechazadoTest.php (extiende BaseDatosTestCase) con los escenarios 1–3 de spec.md US3: el registro existe tras el rechazo con la descripción exacta de data-model.md (`Descuento rechazado: $15.000 (15 %) sobre subtotal $100.000. Máximo del rol Cajero: 10 %`), el `id_usuario` correcto y ninguna venta creada; dos intentos generan dos registros; no hay registro para rechazos por stock, descuento negativo o mayor que el subtotal, ni para ventas aceptadas; y si la escritura de auditoría falla, el usuario recibe igualmente el mensaje del límite
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] En controllers/VentaController.php, `finalizar()`, bloque `catch` (línea 108): después de `$this->db->rollBack()`, si `$e instanceof DescuentoExcedidoException`, registrar `Auditoria::registrar('ventas','descuento rechazado','ventas',0, ...)` con la descripción de data-model.md usando `dinero()` y `formatearPorcentaje()`, fuera de la transacción (research.md R1). Envolver ese registro en `try/catch (Throwable)` con `error_log()` para que un fallo de auditoría no oculte el mensaje al usuario; después relanzar `$e`
-- [ ] T029 [P] [US3] En models/Auditoria.php, `resumen()`: añadir `'descuento rechazado'` a la lista de acciones sensibles (research.md R8)
-- [ ] T030 [US3] Ejecutar `vendor/bin/phpunit --filter AuditoriaDescuentoRechazadoTest` y dejarla en verde
+- [X] T028 [US3] En controllers/VentaController.php, `finalizar()`, bloque `catch` (línea 108): después de `$this->db->rollBack()`, si `$e instanceof DescuentoExcedidoException`, registrar `Auditoria::registrar('ventas','descuento rechazado','ventas',0, ...)` con la descripción de data-model.md usando `dinero()` y `formatearPorcentaje()`, fuera de la transacción (research.md R1). Envolver ese registro en `try/catch (Throwable)` con `error_log()` para que un fallo de auditoría no oculte el mensaje al usuario; después relanzar `$e`
+- [X] T029 [P] [US3] En models/Auditoria.php, `resumen()`: añadir `'descuento rechazado'` a la lista de acciones sensibles (research.md R8)
+- [X] T030 [US3] Ejecutar `vendor/bin/phpunit --filter AuditoriaDescuentoRechazadoTest` y dejarla en verde
 
 **Checkpoint**: Las tres historias funcionan de forma independiente
 

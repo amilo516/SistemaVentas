@@ -38,7 +38,7 @@ class Auditoria {
     public function resumen(array $f): array {
         [$w,$p]=$this->filtros($f);
         $s=$this->db->prepare("SELECT COUNT(*) total,COUNT(DISTINCT a.id_usuario) usuarios,SUM(a.accion='login fallido') fallidos,
-            SUM(a.accion IN ('anular','desactivar','cerrar','permisos','ajuste','salida')) sensibles FROM auditoria a WHERE {$w}");
+            SUM(a.accion IN ('anular','desactivar','cerrar','permisos','ajuste','salida','descuento rechazado')) sensibles FROM auditoria a WHERE {$w}");
         $s->execute($p); return $s->fetch();
     }
 }

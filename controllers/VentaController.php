@@ -115,9 +115,23 @@ class VentaController {
             return $ventaId;
         } catch (Throwable $e) {
             $this->db->rollBack();
+            // Después del rollback, para que el registro del intento se conserve aunque la venta se deshaga.
+            if ($e instanceof DescuentoExcedidoException) $this->auditarDescuentoRechazado($e);
             if ($e instanceof RuntimeException) throw $e;
             error_log('Venta: '.$e->getMessage());
             throw new RuntimeException('No se pudo registrar la venta. Inténtalo de nuevo.');
+        }
+    }
+
+    // Registra el intento rechazado por exceder el descuento máximo (FR-011). Si la auditoría falla,
+    // el usuario igual debe ver el mensaje del límite: el fallo solo queda en el log del servidor.
+    private function auditarDescuentoRechazado(DescuentoExcedidoException $e): void {
+        try {
+            (new Auditoria($this->db))->registrar('ventas','descuento rechazado','ventas',0,
+                'Descuento rechazado: '.dinero($e->descuento).' ('.formatearPorcentaje($e->porcentaje).' %) sobre subtotal '
+                .dinero($e->subtotal).'. Máximo del rol '.$e->rol.': '.formatearPorcentaje($e->maximo).' %');
+        } catch (Throwable $falla) {
+            error_log('Auditoría de descuento rechazado: '.$falla->getMessage());
         }
     }
 
