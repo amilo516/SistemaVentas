@@ -27,10 +27,10 @@ y comprueba que FALLA antes de implementar.
 
 **Purpose**: Incorporar PHPUnit (primera tarea exigida por el usuario y el Principio V)
 
-- [ ] T001 Agregar PHPUnit como dependencia de desarrollo con `composer require --dev phpunit/phpunit:^10.5` (actualiza composer.json y composer.lock) y añadir en composer.json el script `"test": "phpunit"` (research.md R7)
-- [ ] T002 Crear phpunit.xml en la raíz: bootstrap `tests/bootstrap.php`; suites `Unit` (`tests/Unit`) e `Integration` (`tests/Integration`); `<env name="DB_NAME" value="sistema_ventas_test" force="true"/>`; `cacheDirectory=".phpunit.cache"`; `failOnWarning="true"`
-- [ ] T003 Crear tests/bootstrap.php: carga `vendor/autoload.php` y `config/constantes.php`, inicializa `$_SESSION = []` y `$_SERVER['REMOTE_ADDR'] = '127.0.0.1'` sin llamar a `session_start()` y sin incluir `config/config.php` (envía cabeceras)
-- [ ] T004 [P] Añadir `.phpunit.cache/` a .gitignore
+- [X] T001 Agregar PHPUnit como dependencia de desarrollo con `composer require --dev phpunit/phpunit:^10.5` (actualiza composer.json y composer.lock) y añadir en composer.json el script `"test": "phpunit"` (research.md R7)
+- [X] T002 Crear phpunit.xml en la raíz: bootstrap `tests/bootstrap.php`; suites `Unit` (`tests/Unit`) e `Integration` (`tests/Integration`); `<env name="DB_NAME" value="sistema_ventas_test" force="true"/>`; `cacheDirectory=".phpunit.cache"`; `failOnWarning="true"`
+- [X] T003 Crear tests/bootstrap.php: carga `vendor/autoload.php` y `config/constantes.php`, inicializa `$_SESSION = []` y `$_SERVER['REMOTE_ADDR'] = '127.0.0.1'` sin llamar a `session_start()` y sin incluir `config/config.php` (envía cabeceras)
+- [X] T004 [P] Añadir `.phpunit.cache/` a .gitignore
 
 ---
 
