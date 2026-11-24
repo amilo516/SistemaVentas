@@ -1,21 +1,3 @@
-<!--
-Sync Impact Report
-- Version change: (plantilla sin ratificar) → 1.0.0
-- Modified principles: n/a (adopción inicial)
-  - [PRINCIPLE_1_NAME] → I. Respeto a la Arquitectura MVC Existente
-  - [PRINCIPLE_2_NAME] → II. Acceso a Datos con Sentencias Preparadas (NO NEGOCIABLE)
-  - [PRINCIPLE_3_NAME] → III. Autorización por Rol vía helpers/permisos.php
-  - [PRINCIPLE_4_NAME] → IV. Trazabilidad mediante Auditoría
-  - [PRINCIPLE_5_NAME] → V. Pruebas con PHPUnit antes de Terminar (NO NEGOCIABLE)
-- Added sections: Restricciones Técnicas; Flujo de Desarrollo y Criterios de Calidad; Governance
-- Removed sections: ninguna
-- Templates (leen la constitución en tiempo de ejecución; no se modifican aquí):
-  - .specify/templates/plan-template.md ⚠ revisar que "Constitution Check" cubra los 5 principios
-  - .specify/templates/tasks-template.md ⚠ las tareas de prueba son obligatorias (Principio V)
-- Follow-up TODOs:
-  - PHPUnit aún no figura en composer.json ni existe phpunit.xml / tests/; debe incorporarse
-    antes de cerrar la primera funcionalidad nueva (ver Principio V).
--->
 # Sistema de Ventas Constitution
 
 ## Core Principles
