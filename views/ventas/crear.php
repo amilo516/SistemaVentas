@@ -25,7 +25,7 @@ require __DIR__ . '/../layouts/header.php';
 <?php if (!$form['hay_caja_abierta']): ?>
   <div class="alert warn">No hay ninguna caja abierta: las ventas en efectivo no quedarán registradas en caja.<?php if (tienePermiso('caja.abrir')): ?> <a href="../caja/abrir.php">Abrir caja</a><?php endif; ?></div>
 <?php endif; ?>
-<div class="pos" id="pos" data-url="carrito.php" data-csrf="<?= e(csrfToken()) ?>" data-impuesto="<?= e((string)$form['impuesto_pct']) ?>">
+<div class="pos" id="pos" data-url="carrito.php" data-csrf="<?= e(csrfToken()) ?>" data-impuesto="<?= e((string)$form['impuesto_pct']) ?>" data-descuento-maximo="<?= $form['descuento_maximo'] === null ? '' : e((string)$form['descuento_maximo']) ?>">
   <section class="pos-main">
     <div class="card">
       <label class="pos-search">
@@ -57,7 +57,8 @@ require __DIR__ . '/../layouts/header.php';
     </label>
     <dl class="totales">
       <dt>Subtotal</dt><dd id="t-subtotal">$0</dd>
-      <dt><label for="descuento">Descuento</label></dt><dd><input type="number" name="descuento" id="descuento" min="0" step="any" value="0"></dd>
+      <dt><label for="descuento">Descuento</label></dt><dd><input type="number" name="descuento" id="descuento" min="0" step="any" value="0" aria-describedby="limite-descuento">
+        <small class="nota limite-descuento" id="limite-descuento"><?= $form['descuento_maximo'] === null ? 'Sin límite de descuento' : 'Máximo para tu rol: ' . e(formatearPorcentaje($form['descuento_maximo'])) . ' %' ?></small></dd>
       <?php if ($form['impuesto_pct'] > 0): ?><dt>Impuesto (<?= e(cantidad($form['impuesto_pct'])) ?>%)</dt><dd id="t-impuesto">$0</dd><?php endif; ?>
       <dt class="total">Total</dt><dd class="total" id="t-total">$0</dd>
     </dl>

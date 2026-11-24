@@ -1,6 +1,19 @@
 <?php
+require_once __DIR__ . '/../config/constantes.php';
+
 class Rol {
     public function __construct(private PDO $db) {}
+
+    // Rol vigente del usuario y su descuento máximo, leídos en el momento (no de la sesión), para que un
+    // cambio de límite o de rol aplique desde la siguiente venta. 'maximo' null = sin límite (Administrador).
+    public function descuentoMaximoDeUsuario(int $idUsuario): ?array {
+        $s=$this->db->prepare("SELECT r.id_rol,r.nombre,r.descuento_maximo FROM usuarios u
+            INNER JOIN roles r ON r.id_rol=u.rol_id WHERE u.id_usuario=:id");
+        $s->execute(['id'=>$idUsuario]);
+        $r=$s->fetch();
+        if (!$r) return null;
+        return ['rol'=>$r['nombre'],'maximo'=>(int)$r['id_rol']===ROL_ADMINISTRADOR ? null : (float)$r['descuento_maximo']];
+    }
 
     public function listarActivos(): array {
         return $this->db->query("SELECT id_rol,nombre,descripcion FROM roles WHERE estado=1 ORDER BY id_rol")->fetchAll();

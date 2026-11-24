@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const url = pos.dataset.url;
     const csrf = pos.dataset.csrf;
     const impuestoPct = parseFloat(pos.dataset.impuesto) || 0;
+    // Descuento máximo del rol (%). Vacío = sin límite. Solo informa: el servidor es quien decide.
+    const descuentoMaximo = pos.dataset.descuentoMaximo === '' ? null : parseFloat(pos.dataset.descuentoMaximo);
     const $ = id => document.getElementById(id);
     const buscar = $('buscar'), resultados = $('resultados'), tbody = $('items');
     const descuento = $('descuento'), metodo = $('metodo'), recibido = $('recibido');
@@ -70,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         $('t-subtotal').textContent = dinero(subtotal);
         if ($('t-impuesto')) $('t-impuesto').textContent = dinero(impuesto);
         $('t-total').textContent = dinero(total);
+        avisoDescuento(subtotal, parseFloat(descuento.value) || 0);
         const efectivo = metodo.selectedOptions[0]?.dataset.efectivo === '1';
         $('campo-efectivo').hidden = !efectivo;
         $('campo-referencia').hidden = efectivo;
@@ -79,6 +82,20 @@ document.addEventListener('DOMContentLoaded', () => {
         $('cambio').textContent = recibido.value === '' ? '$0' : (cambio >= 0 ? dinero(cambio) : 'Falta ' + dinero(-cambio));
         $('cambio').classList.toggle('falta', recibido.value !== '' && cambio < 0);
         $('finalizar').disabled = !(carrito.items || []).length;
+    }
+
+    // Avisa (sin bloquear el envío) si el descuento escrito supera el máximo del rol.
+    function avisoDescuento(subtotal, desc) {
+        const el = $('limite-descuento');
+        if (!el || descuentoMaximo === null) return;
+        const pct = v => v.toLocaleString('es-CO', { maximumFractionDigits: 2 });
+        // En enteros, igual que helpers/descuentos.php: centavos y centésimas de punto.
+        const d = Math.round(desc * 100), s = Math.round(subtotal * 100), m = Math.round(descuentoMaximo * 100);
+        const excede = d > 0 && s > 0 && d * 10000 > s * m;
+        el.classList.toggle('excede', excede);
+        el.textContent = excede
+            ? `El descuento (${pct(Math.floor((d * 10000 + s - 1) / s) / 100)} %) supera tu máximo (${pct(descuentoMaximo)} %). La venta será rechazada.`
+            : `Máximo para tu rol: ${pct(descuentoMaximo)} %`;
     }
 
     // Búsqueda con espera corta mientras se escribe.

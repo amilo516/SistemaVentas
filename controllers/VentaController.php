@@ -7,7 +7,9 @@ require_once __DIR__ . '/../helpers/permisos.php';
 require_once __DIR__ . '/../helpers/factura.php';
 require_once __DIR__ . '/../helpers/inventario.php';
 require_once __DIR__ . '/../helpers/funciones.php';
+require_once __DIR__ . '/../helpers/descuentos.php';
 require_once __DIR__ . '/../models/Venta.php';
+require_once __DIR__ . '/../models/Rol.php';
 require_once __DIR__ . '/../models/Carrito.php';
 require_once __DIR__ . '/../models/Cliente.php';
 require_once __DIR__ . '/../models/Configuracion.php';
@@ -43,6 +45,8 @@ class VentaController {
             'metodos'=>$this->ventas->metodosPago(),
             'impuesto_pct'=>(float)(new Configuracion($this->db))->obtener('impuesto','0'),
             'hay_caja_abierta'=>(new AperturaCaja($this->db))->hayAlgunaAbierta(),
+            // Descuento máximo del rol del usuario (porcentaje); null = sin límite.
+            'descuento_maximo'=>(new Rol($this->db))->descuentoMaximoDeUsuario((int)$_SESSION['id_usuario'])['maximo'] ?? null,
         ];
     }
 
@@ -67,6 +71,10 @@ class VentaController {
             if ($descuento<0) throw new RuntimeException('El descuento no puede ser negativo.');
             $t=calcularTotales($items, $descuento, $pct);
             if ($descuento>$t['subtotal']) throw new RuntimeException('El descuento no puede ser mayor que el subtotal.');
+            // Límite del rol vigente, leído ahora (FR-013). Se valida antes de cualquier INSERT.
+            $limite=(new Rol($this->db))->descuentoMaximoDeUsuario($usuarioId);
+            if (!$limite) throw new RuntimeException('Tu usuario no existe. Vuelve a iniciar sesión.');
+            validarDescuentoMaximo($t['subtotal'],$t['descuento'],$limite['maximo'],$limite['rol']);
 
             $metodo=$this->metodoPago((int)($post['id_metodo_pago'] ?? 0));
             $esEfectivo=mb_strtolower($metodo['nombre'])==='efectivo';

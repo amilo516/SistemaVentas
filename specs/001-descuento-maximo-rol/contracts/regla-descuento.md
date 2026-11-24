@@ -27,6 +27,8 @@ Sin dependencias de base de datos, sesión ni E/S. Se prueba en `tests/Unit`.
 - Si excede → lanza `DescuentoExcedidoException`; si no → retorna sin efecto.
 - El límite es inclusivo: un descuento igual al máximo **no** lanza.
 - `descuento <= 0` nunca lanza (incluido un máximo de 0 %).
+- `subtotal <= 0` nunca lanza: un descuento sobre subtotal 0 lo rechaza antes la regla existente
+  "no mayor que el subtotal" (FR-015), y aquí produciría un mensaje sin sentido ("0 %").
 
 ## `final class DescuentoExcedidoException extends RuntimeException`
 
@@ -48,6 +50,7 @@ Los números se formatean con `formatearPorcentaje()`; `{porcentaje}` es el valo
 | 100000 | 1 | 0 | lanza |
 | 100000 | 99999 | null | no lanza (Administrador) |
 | 0 | 0 | 10 | no lanza |
+| 0 | 500 | 10 | no lanza (lo rechaza FR-015 antes) |
 | 33333.33 | 3333.33 | 10 | no lanza (9,99999 %) |
 | 1000 | 75 | 7.5 | no lanza |
 | 1000 | 75.01 | 7.5 | lanza |
