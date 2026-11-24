@@ -4,8 +4,21 @@ Sin dependencias de base de datos, sesión ni E/S. Se prueba en `tests/Unit`.
 
 ## `porcentajeDescuento(float $subtotal, float $descuento): float`
 
-- Devuelve `descuento / subtotal × 100`, redondeado a 2 decimales, solo para mostrarlo.
+- Devuelve el porcentaje redondeado HACIA ARRIBA a 2 decimales, calculado en enteros:
+  `intdiv(descuentoCent * 10000 + subtotalCent - 1, subtotalCent) / 100`.
+  Solo se usa para mostrar; así un descuento rechazado nunca se muestra igual al límite. No usa
+  `ceil()` sobre `float` (15000 / 100000 × 100 da `15.000000000000002` y se mostraría 15,01).
 - `subtotal <= 0` → `0.0`.
+
+## `formatearPorcentaje(float $valor): string`
+
+- Coma decimal, sin ceros sobrantes ni separador de miles: `15`, `7,5`, `10,01`, `100`.
+
+## `normalizarDescuentoMaximo(mixed $valor): ?float`
+
+- Recorta espacios y acepta coma o punto decimal (`7,5` → `7.5`).
+- Devuelve `null` si el valor está vacío, no es numérico, es `< 0`, es `> 100` o tiene más de
+  2 decimales (`7,555`). No redondea.
 
 ## `validarDescuentoMaximo(float $subtotal, float $descuento, ?float $maximoPct, string $rol = ''): void`
 
@@ -21,7 +34,8 @@ Propiedades públicas de solo lectura: `subtotal`, `descuento`, `porcentaje` (2 
 `maximo`, `rol`.
 
 `getMessage()`: `El descuento ({porcentaje} %) supera el máximo permitido para tu rol ({maximo} %).`
-Los números se formatean con coma decimal y sin decimales innecesarios (`15`, `7,5`, `10,01`).
+Los números se formatean con `formatearPorcentaje()`; `{porcentaje}` es el valor de
+`porcentajeDescuento()` (redondeado hacia arriba).
 
 ## Casos mínimos de prueba (Unit)
 
@@ -37,3 +51,5 @@ Los números se formatean con coma decimal y sin decimales innecesarios (`15`, `
 | 33333.33 | 3333.33 | 10 | no lanza (9,99999 %) |
 | 1000 | 75 | 7.5 | no lanza |
 | 1000 | 75.01 | 7.5 | lanza |
+| 100000 | 10004 | 10 | lanza; porcentaje mostrado 10,01 |
+| 100000 | 15000 | 20 | no lanza; porcentaje mostrado 15 (sin error de float) |

@@ -11,15 +11,15 @@ Todas las solicitudes POST conservan `verificarCsrf()` y los `requirePermission(
 | `nombre` | texto | sí | existente |
 | `descripcion` | texto | no | existente |
 | `permisos[]` | lista | no | existente (solo editar) |
-| **`descuento_maximo`** | número (`,` o `.` decimal) | no al crear (default 10); sí al editar | 0–100, dos decimales |
+| **`descuento_maximo`** | número (`,` o `.` decimal) | no al crear (default 10); sí al editar | 0–100, como máximo dos decimales |
 
 **Respuestas**:
 
 | Situación | Resultado |
 |-----------|-----------|
 | Valor válido | Se guarda, se audita `roles / descuento maximo` si cambió, se llama a `marcarCambioPermisos()` y aparece el mensaje flash "Rol guardado…" |
-| Valor fuera de rango o no numérico | No se guarda nada; error "El descuento máximo debe ser un número entre 0 y 100."; el formulario conserva lo escrito |
-| Rol propio y usuario no Administrador, con un valor distinto del actual | No se guarda nada; error "Solo el Administrador puede cambiar el descuento máximo de tu propio rol." |
+| Valor fuera de rango, no numérico o con más de dos decimales | No se guarda nada; error "El descuento máximo debe ser un número entre 0 y 100, con hasta dos decimales."; el formulario conserva lo escrito; sin auditoría |
+| Rol propio y usuario no Administrador, con un valor distinto del actual | No se guarda nada; error "Solo el Administrador puede cambiar el descuento máximo de tu propio rol."; se audita `roles / descuento maximo denegado` |
 | Rol Administrador | El campo se muestra de solo lectura con "Sin límite"; un valor enviado se ignora |
 
 **Listado** (`views/roles/index.php`): nueva columna "Desc. máx." con `10 %`, `7,5 %` o

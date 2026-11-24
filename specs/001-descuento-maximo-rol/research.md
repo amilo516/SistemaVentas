@@ -28,8 +28,9 @@ registran las decisiones de diseño y su justificación.
 - **Decision**: la regla trabaja en enteros. El descuento y el subtotal se pasan a centavos y el
   máximo a centésimas de punto porcentual (`round(x*100)`). Se excede si
   `descuentoCent * 10000 > subtotalCent * maximoCentPct`. El porcentaje que se muestra se
-  calcula aparte, redondeado a 2 decimales y truncado hacia arriba solo para mostrarlo (nunca
-  para decidir).
+  calcula aparte, también en enteros, redondeado hacia arriba a centésimas:
+  `intdiv(descuentoCent * 10000 + subtotalCent - 1, subtotalCent) / 100`. Nunca se usa para
+  decidir, y evita que un rechazo se muestre igual al límite (10,004 % → 10,01 %).
 - **Rationale**: la especificación exige que 10,01 % con un límite de 10 % se rechace y que
   10 % exacto se acepte; la aritmética con `float` puede fallar en ese borde.
 - **Alternatives considered**: `bcmath` (extensión no garantizada en XAMPP) y `float` con épsilon
@@ -48,9 +49,11 @@ registran las decisiones de diseño y su justificación.
 
 ## R4. Origen del límite vigente al finalizar la venta
 
-- **Decision**: `Rol::descuentoMaximoDeUsuario(int $idUsuario): ?float` consulta
-  `usuarios JOIN roles` con el id de la sesión, en el momento de finalizar. Si el rol es
-  `ROL_ADMINISTRADOR` devuelve `null`, que significa ilimitado.
+- **Decision**: `Rol::descuentoMaximoDeUsuario(int $idUsuario): ?array` consulta
+  `usuarios JOIN roles` con el id de la sesión, en el momento de finalizar, y devuelve
+  `['rol' => nombre, 'maximo' => ?float]`; `maximo` es `null` (ilimitado) para
+  `ROL_ADMINISTRADOR`. Devuelve `null` si el usuario no existe. El nombre del rol se necesita
+  para el texto de auditoría.
 - **Rationale**: cumple FR-013 (el cambio de límite o de rol aplica desde la siguiente venta,
   sin volver a iniciar sesión) sin depender de la caché de sesión.
 - **Alternatives considered**: guardar el límite en `$_SESSION` y refrescarlo con
@@ -61,10 +64,16 @@ registran las decisiones de diseño y su justificación.
 
 - **Decision**: en `RolController::guardar()`, si el rol editado es el del usuario en sesión
   (`$_SESSION['rol_id']`), el usuario no es Administrador y el valor enviado difiere del actual,
-  se devuelve el error "Solo el Administrador puede cambiar el descuento máximo de tu propio
-  rol" y no se guarda nada del formulario. En la vista el campo se muestra de solo lectura,
+  se registra `roles / descuento maximo denegado` en auditoría, se devuelve el error "Solo el
+  Administrador puede cambiar el descuento máximo de tu propio rol." y no se guarda nada del
+  formulario. En la vista el campo se muestra de solo lectura,
   como ayuda visual; la validación real está en el servidor.
-- **Rationale**: cierra la vía de autoaprobación (aclaración Q2) sin un permiso nuevo.
+- **Rationale**: cierra la vía de autoaprobación (aclaración Q2) sin un permiso nuevo. La
+  escalada indirecta (subir otro rol y pasarse a él) ya está limitada porque
+  `UsuarioController` impide que un usuario cambie su propio rol, y cada cambio de rol se audita;
+  el riesgo de colusión restante se acepta y queda documentado en los supuestos de spec.md.
+- **Alternatives considered**: limitar el valor que se puede asignar a otros roles al límite
+  propio de quien edita (FR-002b); se descartó por restringir de más a los supervisores.
 
 ## R6. Script de actualización y compatibilidad MariaDB/MySQL
 
@@ -100,6 +109,9 @@ registran las decisiones de diseño y su justificación.
     Cajero: 10 %`.
   - Cambio de límite: módulo `roles`, acción `descuento maximo`, tabla `roles`, id del rol.
     Descripción: `Rol Cajero: descuento máximo 10 % → 5 %`.
+  - Cambio denegado del propio rol: módulo `roles`, acción `descuento maximo denegado`, tabla
+    `roles`, id del rol. Descripción: `Intento de cambiar el descuento máximo del propio rol
+    Supervisor: 20 % → 50 %`.
   - Se añade `descuento rechazado` a las acciones "sensibles" del resumen de auditoría.
 - **Rationale**: permite filtrar en el módulo de auditoría existente por módulo y acción
   (FR-011, FR-012).
