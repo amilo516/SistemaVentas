@@ -30,12 +30,13 @@ require __DIR__ . '/../layouts/header.php';
   <div class="fila">
     <label>Nuevo rol<input type="text" name="nombre" value="<?= e($_POST['nombre'] ?? '') ?>" maxlength="50" placeholder="Ej. Bodeguero" required></label>
     <label class="grow"><span>Descripción <small class="muted">(opcional)</small></span><input type="text" name="descripcion" value="<?= e($_POST['descripcion'] ?? '') ?>" maxlength="255" placeholder="Qué hace este rol"></label>
+    <label><span>Desc. máx. (%) <small class="muted">(opcional)</small></span><input type="text" name="descuento_maximo" inputmode="decimal" value="<?= e((string)($_POST['descuento_maximo'] ?? '10')) ?>" maxlength="6" size="6"></label>
     <button class="btn">Crear y asignar permisos</button>
   </div>
 </form>
 <div class="table-card">
   <table class="table">
-    <thead><tr><th>Rol</th><th class="num">Usuarios activos</th><th>Permisos</th><th>Estado</th><th></th></tr></thead>
+    <thead><tr><th>Rol</th><th class="num">Usuarios activos</th><th>Permisos</th><th class="num">Desc. máx.</th><th>Estado</th><th></th></tr></thead>
     <tbody>
     <?php foreach ($roles as $r): $admin = $controller->esAdministrador($r); ?>
       <tr class="<?= $r['estado'] ? '' : 'inactivo' ?>">
@@ -44,6 +45,7 @@ require __DIR__ . '/../layouts/header.php';
         <td><?php $n = $admin ? $totalPermisos : (int)$r['permisos']; ?>
           <div class="permiso-medidor" title="<?= $n ?> de <?= $totalPermisos ?>"><span style="width:<?= $totalPermisos ? round($n / $totalPermisos * 100) : 0 ?>%"></span></div>
           <small class="muted"><?= $admin ? 'Todos' : $n . ' de ' . $totalPermisos ?></small></td>
+        <td class="num"><?= $admin ? 'Sin límite' : e(formatearPorcentaje((float)$r['descuento_maximo'])) . ' %' ?></td>
         <td><span class="badge <?= $r['estado'] ? 'badge-ok' : 'badge-off' ?>"><?= $r['estado'] ? 'Activo' : 'Inactivo' ?></span></td>
         <td class="acciones">
           <a class="btn btn-light btn-sm" href="editar.php?id=<?= (int)$r['id_rol'] ?>"><?= $admin ? 'Ver' : 'Permisos' ?></a>

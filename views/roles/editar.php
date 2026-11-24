@@ -9,6 +9,8 @@ $id = (int)($_GET['id'] ?? 0);
 $rol = $controller->buscar($id);
 if (!$rol) { flash('error', 'El rol no existe.'); redirect('index.php'); }
 $admin = $controller->esAdministrador($rol);
+// Nadie salvo el Administrador cambia el descuento máximo de su propio rol (lo valida también el controlador).
+$propioRol = !$admin && $id === (int)($_SESSION['rol_id'] ?? 0);
 $errores = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
@@ -36,6 +38,13 @@ require __DIR__ . '/../layouts/header.php';
       <div class="form-card">
         <label>Nombre<input type="text" name="nombre" value="<?= e($_POST['nombre'] ?? $rol['nombre']) ?>" maxlength="50" required <?= $admin ? 'readonly' : '' ?>></label>
         <label><span>Descripción <small>(opcional)</small></span><input type="text" name="descripcion" value="<?= e($_POST['descripcion'] ?? ($rol['descripcion'] ?? '')) ?>" maxlength="255"></label>
+        <?php if ($admin): ?>
+          <label>Descuento máximo (%)<input type="text" value="Sin límite" readonly></label>
+        <?php else: $valorDescuento = $propioRol ? formatearPorcentaje((float)$rol['descuento_maximo']) : ($_POST['descuento_maximo'] ?? formatearPorcentaje((float)$rol['descuento_maximo'])); ?>
+          <label><span>Descuento máximo (%) <small>(0 a 100, hasta dos decimales)</small></span>
+            <input type="text" name="descuento_maximo" inputmode="decimal" value="<?= e((string)$valorDescuento) ?>" maxlength="6" required <?= $propioRol ? 'readonly aria-describedby="nota-propio-rol"' : '' ?>></label>
+          <?php if ($propioRol): ?><p class="nota" id="nota-propio-rol">Es tu propio rol: solo el Administrador puede cambiar su descuento máximo.</p><?php endif; ?>
+        <?php endif; ?>
       </div>
       <div class="card">
         <h3 class="card-title">Usuarios con este rol (<?= count($usuarios) ?>)</h3>

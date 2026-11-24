@@ -37,9 +37,13 @@ class Rol {
         $s=$this->db->prepare("SELECT 1 FROM roles WHERE nombre=:n AND id_rol<>:id LIMIT 1");
         $s->execute(['n'=>$nombre,'id'=>$excluirId]); return (bool)$s->fetchColumn();
     }
-    public function crear(string $nombre, ?string $descripcion): int {
-        $this->db->prepare("INSERT INTO roles (nombre,descripcion) VALUES (:n,:d)")->execute(['n'=>$nombre,'d'=>$descripcion]);
+    public function crear(string $nombre, ?string $descripcion, float $descuentoMaximo=10.00): int {
+        $this->db->prepare("INSERT INTO roles (nombre,descripcion,descuento_maximo) VALUES (:n,:d,:dm)")
+            ->execute(['n'=>$nombre,'d'=>$descripcion,'dm'=>$descuentoMaximo]);
         return (int)$this->db->lastInsertId();
+    }
+    public function actualizarDescuentoMaximo(int $id, float $valor): void {
+        $this->db->prepare("UPDATE roles SET descuento_maximo=:v WHERE id_rol=:id")->execute(['v'=>$valor,'id'=>$id]);
     }
     public function actualizar(int $id, string $nombre, ?string $descripcion): void {
         $this->db->prepare("UPDATE roles SET nombre=:n,descripcion=:d WHERE id_rol=:id")->execute(['n'=>$nombre,'d'=>$descripcion,'id'=>$id]);

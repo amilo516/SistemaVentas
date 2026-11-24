@@ -44,6 +44,19 @@ function validarDescuentoMaximo(float $subtotal, float $descuento, ?float $maxim
     }
 }
 
+// Valida el porcentaje máximo que se configura en un rol (data-model.md Rol.descuento_maximo).
+// Acepta coma o punto decimal y espacios alrededor. Devuelve null si no es numérico, está fuera de 0–100
+// o tiene más de 2 decimales; no redondea (7,555 se rechaza, FR-003).
+function normalizarDescuentoMaximo(mixed $valor): ?float {
+    if (is_int($valor) || is_float($valor)) $texto = (string)$valor;
+    elseif (is_string($valor)) $texto = $valor;
+    else return null;
+    $texto = str_replace(',', '.', trim($texto));
+    if (!preg_match('/^\d{1,3}(\.\d{1,2})?$/', $texto)) return null;
+    $numero = (float)$texto;
+    return $numero <= 100 ? $numero : null;
+}
+
 // 15 → "15", 7.5 → "7,5", 10.01 → "10,01". Coma decimal, sin ceros sobrantes ni separador de miles.
 function formatearPorcentaje(float $valor): string {
     return rtrim(rtrim(number_format($valor, 2, ',', ''), '0'), ',');

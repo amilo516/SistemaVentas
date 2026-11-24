@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/constantes.php';
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../helpers/permisos.php';
+require_once __DIR__ . '/../helpers/descuentos.php';
 require_once __DIR__ . '/../models/Rol.php';
 require_once __DIR__ . '/../models/Permiso.php';
 require_once __DIR__ . '/../models/Auditoria.php';
@@ -40,20 +41,55 @@ class RolController {
         return $grupos;
     }
 
-    // Crea ($id=0) o actualiza nombre/descripción. Devuelve [id, errores].
+    // Crea ($id=0) o actualiza nombre, descripción y descuento máximo. Devuelve [id, errores].
+    // Si hay cualquier error no se guarda nada del formulario.
     public function guardar(int $id, array $post): array {
         $nombre=trim($post['nombre'] ?? '');
         $descripcion=mb_substr(trim($post['descripcion'] ?? ''),0,255) ?: null;
         $actual=$id ? $this->roles->buscar($id) : null;
         if ($id && !$actual) return [0,['El rol no existe.']];
-        if ($actual && $this->esAdministrador($actual)) $nombre=$actual['nombre']; // el nombre del administrador no cambia
+        $esAdmin=$actual && $this->esAdministrador($actual);
+        if ($esAdmin) $nombre=$actual['nombre']; // el nombre del administrador no cambia
         $e=[];
         if ($nombre==='' || mb_strlen($nombre)>50) $e[]='El nombre del rol es obligatorio (máximo 50 caracteres).';
         elseif ($this->roles->existeNombre($nombre,$id)) $e[]="Ya existe un rol llamado \"{$nombre}\".";
+
+        // Descuento máximo (FR-001, FR-003, FR-005, FR-014): el Administrador siempre 100; al crear, 10 si se omite.
+        $enviado=$post['descuento_maximo'] ?? null;
+        if ($esAdmin) $descuento=100.00;
+        elseif (!$id && trim((string)($enviado ?? ''))==='') $descuento=10.00;
+        else $descuento=normalizarDescuentoMaximo($enviado);
+        if ($descuento===null) $e[]='El descuento máximo debe ser un número entre 0 y 100, con hasta dos decimales.';
+        $anterior=$actual ? (float)$actual['descuento_maximo'] : null;
+        $cambia=$actual && $descuento!==null && abs($descuento-$anterior)>=0.005;
+
+        // FR-002a: nadie salvo el Administrador cambia el límite de su propio rol (el rol del Administrador es fijo arriba).
+        if ($cambia && !$esAdmin && $id===(int)($_SESSION['rol_id'] ?? 0)) {
+            (new Auditoria($this->db))->registrar('roles','descuento maximo denegado','roles',$id,
+                "Intento de cambiar el descuento máximo del propio rol {$actual['nombre']}: ".formatearPorcentaje($anterior).' % → '.formatearPorcentaje($descuento).' %');
+            $e[]='Solo el Administrador puede cambiar el descuento máximo de tu propio rol.';
+        }
         if ($e) return [0,$e];
-        if ($id) $this->roles->actualizar($id,$nombre,$descripcion); else $id=$this->roles->crear($nombre,$descripcion);
-        (new Auditoria($this->db))->registrar('roles',$actual ? 'editar' : 'crear','roles',$id,"Rol {$nombre}");
-        marcarCambioPermisos($this->db);
+
+        $this->db->beginTransaction();
+        try {
+            if ($id) {
+                $this->roles->actualizar($id,$nombre,$descripcion);
+                if ($cambia) $this->roles->actualizarDescuentoMaximo($id,$descuento);
+            } else {
+                $id=$this->roles->crear($nombre,$descripcion,$descuento);
+            }
+            $auditoria=new Auditoria($this->db);
+            $auditoria->registrar('roles',$actual ? 'editar' : 'crear','roles',$id,"Rol {$nombre}"
+                .($actual ? '' : ' con descuento máximo '.formatearPorcentaje($descuento).' %'));
+            if ($cambia) $auditoria->registrar('roles','descuento maximo','roles',$id,
+                "Rol {$nombre}: descuento máximo ".formatearPorcentaje($anterior).' % → '.formatearPorcentaje($descuento).' %');
+            marcarCambioPermisos($this->db);
+            $this->db->commit();
+        } catch (Throwable $ex) {
+            $this->db->rollBack();
+            throw $ex;
+        }
         return [$id,[]];
     }
 
