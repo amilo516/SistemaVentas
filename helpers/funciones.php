@@ -7,6 +7,15 @@ function dinero(float|int|string|null $valor): string { return '$' . number_form
 function flash(string $tipo, string $mensaje): void { $_SESSION['flash'] = ['tipo' => $tipo, 'mensaje' => $mensaje]; }
 function tomarFlash(): ?array { $f = $_SESSION['flash'] ?? null; unset($_SESSION['flash']); return $f; }
 
+// Datos de un formulario para volver a mostrarlos una sola vez después de redirigir (ej. tras un error),
+// igual que flash(). $clave distingue cada formulario.
+function recordarFormulario(string $clave, array $datos): void { $_SESSION['formulario'][$clave] = $datos; }
+function tomarFormulario(string $clave): array {
+    $d = $_SESSION['formulario'][$clave] ?? [];
+    unset($_SESSION['formulario'][$clave]);
+    return is_array($d) ? $d : [];
+}
+
 // Protección CSRF para formularios POST.
 function csrfToken(): string {
     if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(32));

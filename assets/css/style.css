@@ -95,6 +95,7 @@
 .totales dd input{width:120px;text-align:right;padding:6px 8px}
 .totales .total{font-size:22px;font-weight:bold;color:#111827;border-top:1px solid #e5e7eb;padding-top:10px}
 .cambio{margin:6px 0 0;font-size:15px}.cambio strong{font-size:18px;color:#166534}.cambio .falta{color:#b91c1c}
+/* Descuento máximo del rol bajo el campo Descuento (FR-010); en rojo cuando el descuento lo supera (aviso de ventas.js). */
 .limite-descuento{display:block;margin-top:4px}.limite-descuento.excede{color:#b91c1c;font-weight:600}
 .pos-aviso{position:sticky;top:calc(var(--topbar-h) + 8px);z-index:5}
 .filtros{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:16px 0 8px}

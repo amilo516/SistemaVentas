@@ -73,6 +73,7 @@ class VentaController {
             if ($descuento>$t['subtotal']) throw new RuntimeException('El descuento no puede ser mayor que el subtotal.');
             // Límite del rol vigente, leído ahora (FR-013). Se valida antes de cualquier INSERT.
             $limite=(new Rol($this->db))->descuentoMaximoDeUsuario($usuarioId);
+            // Falla cerrado: sin usuario no hay límite conocido, y un límite null significaría "sin límite".
             if (!$limite) throw new RuntimeException('Tu usuario no existe. Vuelve a iniciar sesión.');
             validarDescuentoMaximo($t['subtotal'],$t['descuento'],$limite['maximo'],$limite['rol']);
 

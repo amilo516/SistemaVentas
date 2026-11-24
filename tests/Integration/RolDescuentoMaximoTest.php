@@ -84,6 +84,16 @@ final class RolDescuentoMaximoTest extends BaseDatosTestCase {
         $this->assertSame('10.00', $this->rol($id)['descuento_maximo']);
     }
 
+    // data-model.md: el valor inicial queda en el registro "crear" (no hay valor anterior para "descuento maximo")
+    public function testCrearUnRolRegistraSuValorInicial(): void {
+        [$id] = (new RolController())->guardar(0, ['nombre' => 'Bodeguero', 'descuento_maximo' => '7,5']);
+        $crear = $this->auditoria('crear');
+        $this->assertCount(1, $crear);
+        $this->assertSame('Rol Bodeguero con descuento máximo 7,5 %', $crear[0]['descripcion']);
+        $this->assertSame($id, (int)$crear[0]['id_registro']);
+        $this->assertCount(0, $this->auditoria('descuento maximo'));
+    }
+
     public function testRolNuevoConValorIndicado(): void {
         [$id, $errores] = (new RolController())->guardar(0, ['nombre' => 'Mayorista', 'descuento_maximo' => '3,25']);
         $this->assertSame([], $errores);

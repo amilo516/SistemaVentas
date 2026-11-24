@@ -42,8 +42,12 @@ un cambio de rol o de límite aplica desde la siguiente venta.
 | Evento | `modulo` | `accion` | `tabla_afectada` | `id_registro` | `descripcion` (ejemplo) |
 |--------|----------|----------|------------------|---------------|-------------------------|
 | Intento rechazado | `ventas` | `descuento rechazado` | `ventas` | NULL (0) | `Descuento rechazado: $15.000 (15 %) sobre subtotal $100.000. Máximo del rol Cajero: 10 %` |
+| Creación de rol (registro `crear` existente, ampliado) | `roles` | `crear` | `roles` | id del rol | `Rol Bodeguero con descuento máximo 10 %` |
 | Cambio de límite | `roles` | `descuento maximo` | `roles` | id del rol | `Rol Cajero: descuento máximo 10 % → 5 %` |
 | Cambio denegado del propio rol | `roles` | `descuento maximo denegado` | `roles` | id del rol | `Intento de cambiar el descuento máximo del propio rol Supervisor: 20 % → 50 %` |
+
+Al crear un rol no hay valor anterior, así que no se genera `descuento maximo`: el valor inicial
+queda en el texto del registro `crear`.
 
 `id_usuario`, `fecha` e `ip` se completan como hoy en `Auditoria::registrar()`. El intento
 rechazado se inserta **después** del `rollBack()` de la venta, por lo que persiste.

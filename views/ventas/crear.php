@@ -13,10 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('detalle.php?id=' . $id . '&nueva=1');
     } catch (RuntimeException $e) {
         flash('error', $e->getMessage());
+        // Al volver, el cliente y el método de pago siguen como los dejó el usuario (el carrito ya está en la BD).
+        recordarFormulario('venta', ['id_cliente' => (int)($_POST['id_cliente'] ?? 0), 'id_metodo_pago' => (int)($_POST['id_metodo_pago'] ?? 0)]);
         redirect('crear.php');
     }
 }
 $form = $ventas->datosFormulario();
+$previo = tomarFormulario('venta');
 $estado = (new CarritoController())->estado();
 $titulo = 'Nueva venta';
 require __DIR__ . '/../layouts/header.php';
@@ -50,7 +53,7 @@ require __DIR__ . '/../layouts/header.php';
     <?= csrfCampo() ?>
     <label><span class="label-fila">Cliente<?php if (tienePermiso('clientes.crear')): ?><a href="../clientes/crear.php?volver=pos">+ Nuevo cliente</a><?php endif; ?></span>
       <select name="id_cliente" required>
-        <?php $clienteSel = (int)($_GET['cliente'] ?? 0); foreach ($form['clientes'] as $c): ?>
+        <?php $clienteSel = (int)($previo['id_cliente'] ?? $_GET['cliente'] ?? 0); foreach ($form['clientes'] as $c): ?>
           <option value="<?= (int)$c['id_cliente'] ?>" <?= $clienteSel === (int)$c['id_cliente'] ? 'selected' : '' ?>><?= e($c['nombre']) ?><?= $c['documento'] ? ' · ' . e($c['documento']) : '' ?></option>
         <?php endforeach; ?>
       </select>
@@ -64,8 +67,8 @@ require __DIR__ . '/../layouts/header.php';
     </dl>
     <label>Método de pago
       <select name="id_metodo_pago" id="metodo" required>
-        <?php foreach ($form['metodos'] as $m): ?>
-          <option value="<?= (int)$m['id_metodo_pago'] ?>" data-efectivo="<?= mb_strtolower($m['nombre']) === 'efectivo' ? '1' : '0' ?>"><?= e($m['nombre']) ?></option>
+        <?php $metodoSel = (int)($previo['id_metodo_pago'] ?? 0); foreach ($form['metodos'] as $m): ?>
+          <option value="<?= (int)$m['id_metodo_pago'] ?>" data-efectivo="<?= mb_strtolower($m['nombre']) === 'efectivo' ? '1' : '0' ?>" <?= $metodoSel === (int)$m['id_metodo_pago'] ? 'selected' : '' ?>><?= e($m['nombre']) ?></option>
         <?php endforeach; ?>
       </select>
     </label>

@@ -95,6 +95,22 @@ final class VentaDescuentoMaximoTest extends BaseDatosTestCase {
         $this->assertSame('Aprendiz', $e->rol);
     }
 
+    // Guarda de seguridad: si el usuario de la sesión ya no existe, la venta se rechaza en vez de quedar sin límite
+    // (sin la guarda, el límite sería null y validarDescuentoMaximo() lo trataría como "sin límite").
+    public function testUsuarioInexistenteNoVendeSinLimite(): void {
+        self::$db->exec('SET FOREIGN_KEY_CHECKS = 0'); // única forma de borrar un usuario con carrito (ON DELETE RESTRICT)
+        self::$db->exec("DELETE FROM usuarios WHERE id_usuario = {$this->cajero}");
+        self::$db->exec('SET FOREIGN_KEY_CHECKS = 1');
+        try {
+            (new VentaController())->finalizar($this->venta(15000));
+            $this->fail('La venta debía rechazarse.');
+        } catch (RuntimeException $e) {
+            $this->assertNotInstanceOf(DescuentoExcedidoException::class, $e);
+            $this->assertSame('Tu usuario no existe. Vuelve a iniciar sesión.', $e->getMessage());
+        }
+        $this->assertNadaRegistrado();
+    }
+
     // FR-015: las reglas actuales no cambian ni se tratan como descuento excesivo
     public static function reglasActuales(): array {
         return [

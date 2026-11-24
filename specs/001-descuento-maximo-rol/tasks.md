@@ -216,3 +216,13 @@ Task: "T025 views/roles/index.php"
 - El comportamiento de T028 ante un fallo de auditoría ya está respaldado por FR-011 (spec.md)
 - Se trabaja en `recuperacion/gutierrez` (excepción documentada en plan.md, Complexity Tracking); no crear ramas
 - Commit after each task or logical group
+
+---
+
+## Phase 7: Convergence
+
+- [X] T035 Conservar el cliente y el método de pago elegidos cuando `finalizar()` rechaza la venta (hoy views/ventas/crear.php redirige a `crear.php` y los selectores vuelven al cliente de `?cliente=` y al primer método), y añadir la prueba que lo verifique, en views/ventas/crear.php per US1/AC4 (partial)
+- [X] T036 Añadir `autoload-dev` para `tests/` en composer.json, o documentar en plan.md que el `require_once` de tests/bootstrap.php lo sustituye, per plan: estructura composer.json (partial)
+- [X] T037 Revisar y justificar (o quitar) la regla `.limite-descuento` / `.excede` añadida en assets/css/style.css, que ninguna tarea pedía, per FR-010 (unrequested)
+- [X] T038 Revisar frente a FR-012 y data-model.md el texto " con descuento máximo X %" añadido al registro `roles / crear` en controllers/RolController.php, y documentarlo o quitarlo, per FR-012 (unrequested)
+- [X] T039 Revisar el rechazo "Tu usuario no existe. Vuelve a iniciar sesión." de controllers/VentaController.php `finalizar()`, no especificado, y añadirle una prueba o justificarlo, per FR-006 (unrequested)
