@@ -8,6 +8,17 @@
 
 **Input**: User description: "Quiero que cada rol tenga un porcentaje máximo de descuento permitido al registrar una venta. Si un usuario aplica un descuento mayor al máximo de su rol, la venta debe rechazarse con un mensaje que indique el límite permitido. Un administrador debe poder configurar ese porcentaje por rol. Esto evita que se otorguen descuentos excesivos sin autorización. Cada intento rechazado debe quedar registrado en auditoría."
 
+## Clarifications
+
+### Session 2026-11-24
+
+- Q: ¿Con qué porcentaje máximo de descuento arrancan los roles existentes y los que se creen
+  después, mientras el administrador no lo configure? → A: 10 % para todos los roles
+  (existentes y nuevos), excepto el Administrador, que no tiene límite.
+- Q: ¿Quién puede cambiar el porcentaje máximo de descuento de un rol? → A: cualquier usuario
+  con el permiso "Gestionar roles y permisos", excepto para el límite de su propio rol, que solo
+  puede cambiar el Administrador.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Rechazar ventas con descuento superior al permitido (Priority: P1)
@@ -60,12 +71,16 @@ descuento.
 2. **Given** un administrador, **When** intenta guardar un valor menor que 0, mayor que 100 o
    no numérico, **Then** el sistema rechaza el cambio con un mensaje claro y conserva el valor
    anterior.
-3. **Given** un usuario sin permiso para administrar roles, **When** intenta cambiar el
-   porcentaje (incluso accediendo directamente a la dirección), **Then** recibe "Acceso
+3. **Given** un usuario sin el permiso "Gestionar roles y permisos", **When** intenta cambiar
+   el porcentaje (incluso accediendo directamente a la dirección), **Then** recibe "Acceso
    denegado" y el valor no cambia.
-4. **Given** un cambio de 10 % a 5 % en el rol Cajero, **When** un cajero con sesión ya
+4. **Given** un Supervisor con el permiso "Gestionar roles y permisos", **When** intenta cambiar
+   el porcentaje máximo del rol Supervisor, **Then** el sistema lo rechaza con el mensaje "Solo
+   el Administrador puede cambiar el descuento máximo de tu propio rol" y el valor no cambia;
+   **And** sí puede cambiar el del rol Cajero.
+5. **Given** un cambio de 10 % a 5 % en el rol Cajero, **When** un cajero con sesión ya
    iniciada registra su siguiente venta, **Then** se aplica el nuevo límite de 5 %.
-5. **Given** un cambio del porcentaje de un rol, **When** se consulta la auditoría, **Then**
+6. **Given** un cambio del porcentaje de un rol, **When** se consulta la auditoría, **Then**
    aparece un registro con el rol, el valor anterior, el valor nuevo y quién lo cambió.
 
 ---
@@ -101,11 +116,11 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
   el Administrador siempre tiene todos los permisos; su valor no se puede reducir.
 - **Rol con máximo 0 %**: cualquier descuento mayor que cero se rechaza; las ventas sin
   descuento funcionan normalmente.
-- **Valor inicial de los roles existentes y de los roles nuevos**: [NEEDS CLARIFICATION: al
-  activar la funcionalidad, ¿qué máximo tienen los roles existentes (Vendedor, Cajero,
-  Supervisor y personalizados) y los roles que se creen después? Opciones: 0 % (nadie puede
-  descontar hasta que el administrador lo configure), 100 % (sin cambio de comportamiento hasta
-  configurarlo) o un valor fijo para todos.]
+- **Valor inicial de los roles existentes y de los roles nuevos**: al activar la funcionalidad,
+  todos los roles existentes distintos del Administrador quedan con un máximo de 10 %, y cada
+  rol nuevo se crea con 10 % salvo que el administrador indique otro valor al crearlo. Un usuario
+  que hoy da descuentos mayores al 10 % será rechazado hasta que el administrador suba el límite
+  de su rol.
 - **Porcentajes con decimales**: el máximo admite hasta dos decimales (por ejemplo, 7,5 %). La
   comparación usa el porcentaje exacto del descuento sobre el subtotal, sin redondear a favor
   del usuario: 10,01 % con límite de 10 % se rechaza.
@@ -123,8 +138,10 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
 
 - **FR-001**: Cada rol MUST tener un porcentaje máximo de descuento, con valores de 0 a 100 y
   hasta dos decimales.
-- **FR-002**: Solo los usuarios con permiso para administrar roles MUST poder ver y modificar el
-  porcentaje máximo; la verificación MUST hacerse en el servidor en cada solicitud.
+- **FR-002**: Solo los usuarios con el permiso "Gestionar roles y permisos" MUST poder consultar
+  y modificar el porcentaje máximo en la gestión de roles; la verificación MUST hacerse en el servidor en cada solicitud.
+- **FR-002a**: Un usuario MUST NOT poder modificar el porcentaje máximo de su propio rol, salvo
+  que sea Administrador; el intento MUST rechazarse con un mensaje claro y sin cambiar el valor.
 - **FR-003**: El sistema MUST rechazar valores fuera del rango 0–100 o no numéricos, mostrando
   un mensaje claro y conservando el valor anterior.
 - **FR-004**: El listado de roles MUST mostrar el porcentaje máximo vigente de cada rol.
@@ -146,8 +163,9 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
   el rol, el valor anterior, el valor nuevo y el usuario que lo cambió.
 - **FR-013**: Los cambios del porcentaje máximo o del rol de un usuario MUST aplicarse a partir
   de la siguiente venta, sin necesidad de que el usuario cierre e inicie sesión.
-- **FR-014**: El valor inicial del máximo para los roles existentes y para los roles nuevos MUST
-  seguir la regla que se defina en la aclaración pendiente de los casos límite.
+- **FR-014**: Al activar la funcionalidad, todos los roles existentes excepto el Administrador
+  MUST quedar con un máximo de 10 %; los roles nuevos MUST crearse con 10 % por defecto, y el
+  administrador puede cambiarlo al crearlos o después.
 - **FR-015**: Las reglas actuales de descuento (no negativo, no mayor que el subtotal) MUST
   mantenerse sin cambios.
 
@@ -183,8 +201,8 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
 - El descuento sigue siendo un monto único sobre el subtotal de la venta completa, como hoy; los
   descuentos por producto quedan fuera del alcance.
 - El porcentaje se calcula como descuento ÷ subtotal × 100, antes de impuestos.
-- "Administrador" se refiere a quien tiene el permiso para administrar roles; la configuración
-  se hace en la gestión de roles que ya existe.
+- La configuración se hace en la gestión de roles que ya existe y usa el permiso existente
+  "Gestionar roles y permisos"; no se crea un permiso nuevo.
 - No se incluye un flujo de aprobación o autorización de un supervisor para superar el límite;
   el usuario debe reducir el descuento o pedir a alguien con un límite mayor que registre la
   venta.
