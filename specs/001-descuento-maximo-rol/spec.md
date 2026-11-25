@@ -52,10 +52,19 @@ registrarla con $10.000 (10 %) y comprobar que se acepta.
 
 ### User Story 2 - Configurar el porcentaje máximo de cada rol (Priority: P1)
 
-Un administrador entra a la gestión de roles y, para cada rol, define el porcentaje máximo de
-descuento permitido (de 0 % a 100 %). Ve el valor actual de cada rol en el listado de roles y
-puede cambiarlo cuando lo necesite. El cambio aplica a partir de la siguiente venta de los
-usuarios de ese rol.
+Un usuario con el permiso "Gestionar roles y permisos" (en esta especificación, "administrador"
+en minúscula; normalmente el rol Administrador o un Supervisor con ese permiso) entra a la
+gestión de roles y, para cada rol, define el porcentaje máximo de descuento permitido (de 0 % a
+100 %). Ve el valor actual de cada rol en el listado de roles y puede cambiarlo cuando lo
+necesite, salvo el de su propio rol (FR-002a). El cambio aplica a partir de la siguiente venta
+de los usuarios de ese rol.
+
+**Terminología**: cuando se trata de configurar el límite (US2, FR-002, FR-014, SC-004 y los
+casos límite y supuestos sobre el valor inicial), "administrador" (en minúscula) significa
+cualquier usuario con el permiso "Gestionar roles y permisos". Cuando se trata de revisar la
+auditoría (US3 y el caso límite de intentos repetidos), significa quien tiene el permiso
+"Consultar auditoría". "Administrador" (con mayúscula) es siempre el rol del sistema, que tiene
+todos los permisos y descuento ilimitado (FR-005).
 
 **Why this priority**: sin la configuración no hay límites que aplicar; es igual de necesaria
 que la validación para tener un producto utilizable.
@@ -156,7 +165,7 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
   que sea Administrador; el intento MUST rechazarse con un mensaje claro, sin cambiar el valor,
   y MUST registrarse en la auditoría. Al rechazarse, MUST NOT guardarse nada del formulario
   (tampoco el nombre, la descripción ni los permisos). "Propio rol" es el rol que el usuario
-  tiene asignado en el momento de guardar; si un administrador se lo cambió, se considera el
+  tiene asignado en el momento de guardar; si se lo cambiaron desde la gestión de usuarios, se considera el
   nuevo desde su siguiente acción.
 - **FR-003**: El sistema MUST rechazar valores fuera del rango 0–100, no numéricos o con más de
   dos decimales, mostrando un mensaje claro y conservando el valor anterior. Acepta coma o punto

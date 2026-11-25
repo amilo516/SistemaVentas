@@ -14,7 +14,7 @@ implementar.
 
 - [x] CHK001 - ¿Está especificado qué permiso se requiere para registrar una venta sujeta al límite, o solo se da por supuesto el permiso de ventas existente? [Gap, Spec §FR-006]
 - [x] CHK002 - ¿Es coherente que FR-002 restrinja "consultar" el porcentaje a quien gestiona roles mientras FR-010 lo muestra a todo vendedor en la pantalla de venta? ¿Se delimita qué puede ver cada actor? [Consistency, Spec §FR-002, §FR-010]
-- [ ] CHK003 - ¿Se usa un único término para quien configura el límite? La Historia 2 dice "un administrador" y FR-002 dice "usuarios con el permiso Gestionar roles y permisos". [Ambiguity, Spec §US2, §FR-002]
+- [x] CHK003 - ¿Se usa un único término para quien configura el límite? La Historia 2 dice "un administrador" y FR-002 dice "usuarios con el permiso Gestionar roles y permisos". [Ambiguity, Spec §US2, §FR-002]
 - [x] CHK004 - ¿Está definido que la verificación de permisos aplica también a la creación de roles, y no solo a la edición, al fijar el porcentaje inicial? [Completeness, Spec §FR-002, §FR-014]
 - [x] CHK005 - ¿Se especifica qué ocurre si el rol del usuario se desactiva o el usuario pierde el permiso de ventas entre abrir el formulario y confirmar la venta? [Edge Case, Spec §Edge Cases]
 
