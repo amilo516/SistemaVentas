@@ -59,6 +59,11 @@ cada prueba primero y comprueba que FALLA antes de implementar.
   - visibilidad: un cajero ve el panel; un rol personalizado con `dashboard.ver` y sin `productos.ver` no lo ve, ni ningún dato de stock (US1/AC6, SC-004); un rol con `productos.ver` y sin `ventas.ver` sí lo ve (US1/AC8);
   - posición y contenido: el panel aparece después de los paneles existentes (FR-001); cada fila muestra nombre, stock y mínimo con su unidad y no muestra precio ni código (FR-003); un agotado lleva el texto "Agotado" (US1/AC7);
   - límite y errores: "Ver todos (N) →" hacia `views/productos/stock.php` aparece con 11 productos en alerta y no con 10 (FR-006); con la consulta fallando se ve "Sin datos disponibles" y el resto del dashboard sigue (FR-010); un nombre con `<b>` se muestra escapado
+- [ ] T024 [US1] Añadir a tests/Integration/PanelStockBajoVistaTest.php la prueba del cambio de permisos con la sesión abierta (spec.md FR-008, segunda frase). Usa la misma sesión en todas las cargas, sin volver a iniciarla:
+  - quitar el permiso: un cajero carga el dashboard y ve el panel; en la base de pruebas se le quita `productos.ver` a su rol y se renueva `permisos_version`, como hace `marcarCambioPermisos()`; la siguiente carga ya no muestra el panel ni ningún dato de stock;
+  - dar el permiso: un rol sin `productos.editar` lo recibe y, tras renovar `permisos_version`, la siguiente carga muestra los nombres enlazados a la edición.
+
+  Mismo archivo que T008, así que va después de T008 y antes de T014. La ejecuta T013.
 
 ### Implementation for User Story 1
 

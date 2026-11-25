@@ -36,9 +36,10 @@ edición solo si `tienePermiso('productos.editar')`.
 
 **Project Type**: Aplicación web monolítica PHP con MVC propio.
 
-**Performance Goals**: SC-005, el dashboard en menos de 2 s con 5.000 productos activos. La consulta
-es la de `listar()`, filtrada por estado y stock; el orden se hace en PHP sobre las filas en
-alerta (normalmente decenas).
+**Performance Goals**: SC-005, el servidor genera el dashboard completo en menos de 2 s con 5.000
+productos activos, 1.000 de ellos en alerta, en el entorno XAMPP de desarrollo. La consulta es la
+de `listar()`, filtrada por estado y stock; el orden se hace en PHP sobre las filas en alerta (en
+la medición de SC-005, 1.000 filas).
 
 **Constraints**: no duplicar la regla ni la consulta de stock bajo; no cambiar el comportamiento
 de `listar()` para quienes ya lo usan (`views/productos/index.php`, `views/productos/stock.php`);
