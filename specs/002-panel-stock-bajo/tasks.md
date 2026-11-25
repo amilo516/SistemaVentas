@@ -127,7 +127,8 @@ cada prueba primero y comprueba que FALLA antes de implementar.
 - [X] T020 Revisar el cumplimiento de la constitución en los archivos modificados: ningún SQL en public/dashboard.php; toda salida dinámica con `e()` o convertida a entero; el `LIMIT` de `listar()` siempre entero; el panel y el enlace protegidos con `tienePermiso()`
 - [X] T021 Medir SC-005 en `sistema_ventas_test`: con 5.000 productos activos, 1.000 de ellos en alerta, generar `public/dashboard.php` con tests/Integration/fixtures/ejecutar_vista.php y registrar el tiempo (debe ser menos de 2 s). No usar la base real
 - [X] T022 Ejecutar la suite completa `vendor/bin/phpunit` y confirmar que queda toda en verde (Principio V)
-- [ ] T023 Validación manual en el navegador según specs/002-panel-stock-bajo/quickstart.md (pasos 1–6). La hace el responsable en su base; registrar el resultado de cada paso
+- [X] T023 Validación manual en el navegador según specs/002-panel-stock-bajo/quickstart.md (pasos 1–6). La hace el responsable en su base; registrar el resultado de cada paso
+  - Resultado (2026-11-24, responsable): pasos 1–6 y 9 OK. Pasos 7 (rol sin ventas) y 8 (nombre largo y móvil) sin probar a mano. El 7 lo cubre la prueba automática `testConProductosPeroSinVentasTambienHayPanel`; el 8 no tiene prueba automática (depende del CSS).
 
 ---
 
