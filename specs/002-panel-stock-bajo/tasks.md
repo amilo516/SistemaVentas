@@ -202,3 +202,10 @@ Task: "T012 assets/css/style.css"
 - Las pruebas de integración usan solo `sistema_ventas_test`; T021 y las pruebas de la vista no tocan la base real
 - Se trabaja en `recuperacion/gutierrez` (excepción documentada en plan.md, Complexity Tracking); no crear ramas
 - Commit after each task or logical group
+
+---
+
+## Phase 7: Convergence
+
+- [X] T025 Verificar en un navegador, en escritorio y a ancho de móvil (por ejemplo 375 px), que un producto en alerta con un nombre muy largo y sin espacios se muestra completo, pasa a la línea siguiente y la página no se desplaza horizontalmente; si no se cumple, corregir `.lista-stock` en assets/css/style.css. Hoy no hay evidencia: no lo cubre ninguna prueba automática y el paso 8 de quickstart.md no se ejecutó (T023), per spec.md caso límite "Nombres largos o con caracteres especiales" (partial)
+  - Resultado (2026-11-24, responsable): OK en escritorio y en móvil; el nombre largo pasa a la línea siguiente sin desplazamiento horizontal.
