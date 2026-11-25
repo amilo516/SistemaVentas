@@ -26,6 +26,9 @@ final class ReglaDescuentoTest extends TestCase {
             '7,501 % con límite 7,5 %'      => [1000, 75.01, 7.5, true],
             '10,004 % con límite 10 %'      => [100000, 10004, 10, true],
             '15 % con límite 20 %'          => [100000, 15000, 20, false],
+            // T043: rol normal con máximo 100 % (caso límite de spec.md)
+            'máximo 100: igual al subtotal' => [1000, 1000, 100, false],
+            'máximo 100: 0,01 más'          => [1000, 1000.01, 100, true],
         ];
     }
 

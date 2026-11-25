@@ -136,6 +136,22 @@ final class VentaDescuentoMaximoTest extends BaseDatosTestCase {
         $this->assertSame('El descuento (10,01 %) supera el máximo permitido para tu rol (10 %).', $e->getMessage());
     }
 
+    // T042 (FR-006): el porcentaje se calcula sobre el subtotal ANTES de impuestos. Con impuesto 19 % el total sería
+    // $119.000; si la base fuera el total, $10.001 sería el 8,4 % y se aceptaría.
+    public function testConImpuestoElLimiteSeAplicaSobreElSubtotalSinImpuestos(): void {
+        self::$db->exec("UPDATE configuracion SET valor = '19' WHERE clave = 'impuesto'");
+        $e = $this->rechazo(10001);
+        $this->assertSame('El descuento (10,01 %) supera el máximo permitido para tu rol (10 %).', $e->getMessage());
+        $this->assertSame(100000.0, $e->subtotal, 'La base es el subtotal sin impuestos.');
+    }
+
+    public function testConImpuestoUnDescuentoDelDiezPorCientoDelSubtotalSeAcepta(): void {
+        self::$db->exec("UPDATE configuracion SET valor = '19' WHERE clave = 'impuesto'");
+        $id = (new VentaController())->finalizar($this->venta(10000)); // 10 % de $100.000
+        $venta = self::$db->query("SELECT subtotal, descuento, impuesto, total FROM ventas WHERE id_venta = {$id}")->fetch(PDO::FETCH_ASSOC);
+        $this->assertSame(['subtotal' => '100000.00', 'descuento' => '10000.00', 'impuesto' => '17100.00', 'total' => '107100.00'], $venta);
+    }
+
     // FR-010: la pantalla recibe el límite del usuario
     public function testDatosFormularioIncluyenElMaximoDelRol(): void {
         $this->assertSame(10.0, (new VentaController())->datosFormulario()['descuento_maximo']);

@@ -226,3 +226,12 @@ Task: "T025 views/roles/index.php"
 - [X] T037 Revisar y justificar (o quitar) la regla `.limite-descuento` / `.excede` añadida en assets/css/style.css, que ninguna tarea pedía, per FR-010 (unrequested)
 - [X] T038 Revisar frente a FR-012 y data-model.md el texto " con descuento máximo X %" añadido al registro `roles / crear` en controllers/RolController.php, y documentarlo o quitarlo, per FR-012 (unrequested)
 - [X] T039 Revisar el rechazo "Tu usuario no existe. Vuelve a iniciar sesión." de controllers/VentaController.php `finalizar()`, no especificado, y añadirle una prueba o justificarlo, per FR-006 (unrequested)
+
+---
+
+## Phase 8: Convergence
+
+- [X] T040 Añadir una prueba de integración que ejecute la vista real views/roles/editar.php (con tests/Integration/fixtures/ejecutar_vista.php): un Supervisor con "Gestionar roles y permisos" envía su propio rol con otro descuento máximo y una lista de permisos distinta; comprobar que se muestra el error de FR-002a y que ni el límite, ni el nombre, ni la descripción, ni los permisos del rol cambian, per FR-002a (partial)
+- [X] T041 Añadir pruebas de integración que hagan POST a la vista real views/ventas/crear.php con una venta en curso: (a) tras quitar `ventas.crear` al rol del usuario y renovar `permisos_version`, la respuesta es "Acceso denegado" y no se registra ninguna venta; (b) tras desactivar al usuario, su sesión se cierra y no se registra ninguna venta, per spec.md caso límite "Rol desactivado o permiso retirado con una venta en curso" (partial)
+- [X] T042 Añadir a tests/Integration/VentaDescuentoMaximoTest.php un caso con el impuesto configurado en 19 %: con subtotal $100.000 y descuento $10.000 (10 % sin impuestos) la venta se acepta para un rol de 10 %, y con $10.001 se rechaza, comprobando que el porcentaje se calcula sobre el subtotal antes de impuestos, per FR-006 (partial)
+- [X] T043 Añadir a tests/Unit/ReglaDescuentoTest.php casos con máximo 100 en un rol normal: un descuento igual al subtotal no lanza y uno de 0,01 más sí lanza, per spec.md caso límite "Rol con máximo 100 %" (partial)
