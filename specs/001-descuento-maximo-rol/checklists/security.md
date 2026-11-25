@@ -12,52 +12,52 @@ implementar.
 
 ## Permisos y autorización
 
-- [ ] CHK001 - ¿Está especificado qué permiso se requiere para registrar una venta sujeta al límite, o solo se da por supuesto el permiso de ventas existente? [Gap, Spec §FR-006]
-- [ ] CHK002 - ¿Es coherente que FR-002 restrinja "consultar" el porcentaje a quien gestiona roles mientras FR-010 lo muestra a todo vendedor en la pantalla de venta? ¿Se delimita qué puede ver cada actor? [Consistency, Spec §FR-002, §FR-010]
+- [x] CHK001 - ¿Está especificado qué permiso se requiere para registrar una venta sujeta al límite, o solo se da por supuesto el permiso de ventas existente? [Gap, Spec §FR-006]
+- [x] CHK002 - ¿Es coherente que FR-002 restrinja "consultar" el porcentaje a quien gestiona roles mientras FR-010 lo muestra a todo vendedor en la pantalla de venta? ¿Se delimita qué puede ver cada actor? [Consistency, Spec §FR-002, §FR-010]
 - [ ] CHK003 - ¿Se usa un único término para quien configura el límite? La Historia 2 dice "un administrador" y FR-002 dice "usuarios con el permiso Gestionar roles y permisos". [Ambiguity, Spec §US2, §FR-002]
-- [ ] CHK004 - ¿Está definido que la verificación de permisos aplica también a la creación de roles, y no solo a la edición, al fijar el porcentaje inicial? [Completeness, Spec §FR-002, §FR-014]
-- [ ] CHK005 - ¿Se especifica qué ocurre si el rol del usuario se desactiva o el usuario pierde el permiso de ventas entre abrir el formulario y confirmar la venta? [Edge Case, Spec §Edge Cases]
+- [x] CHK004 - ¿Está definido que la verificación de permisos aplica también a la creación de roles, y no solo a la edición, al fijar el porcentaje inicial? [Completeness, Spec §FR-002, §FR-014]
+- [x] CHK005 - ¿Se especifica qué ocurre si el rol del usuario se desactiva o el usuario pierde el permiso de ventas entre abrir el formulario y confirmar la venta? [Edge Case, Spec §Edge Cases]
 
 ## Autoaprobación y escalamiento de privilegios
 
-- [ ] CHK006 - ¿Cubren los requisitos la escalada indirecta: un usuario que sube el límite de otro rol y luego se asigna a ese rol (o pide que lo asignen)? [Gap, Spec §FR-002a]
-- [ ] CHK007 - ¿Se define si un usuario con permiso de gestionar roles puede crear un rol nuevo con 100 % y asignarlo a sí mismo o a un cómplice? [Gap, Spec §FR-002a, §FR-014]
-- [ ] CHK008 - ¿Está definido qué se considera "su propio rol" cuando el rol del usuario cambia durante la sesión (rol de la sesión frente al rol vigente en la base)? [Clarity, Spec §FR-002a, §FR-013]
-- [ ] CHK009 - ¿Especifica FR-002a si la restricción aplica también al resto del formulario del propio rol (nombre, permisos) o solo al porcentaje? [Clarity, Spec §FR-002a]
-- [ ] CHK010 - ¿Está documentado que el valor del Administrador no se puede alterar por ninguna vía, incluido el envío manipulado del formulario y no solo la interfaz? [Completeness, Spec §FR-005]
-- [ ] CHK011 - ¿Se exige que la validación del descuento en la venta ocurra en el servidor, independiente de cualquier aviso en el navegador, y que el monto enviado nunca se tome como ya validado? [Completeness, Spec §FR-006, contracts/formularios.md]
+- [x] CHK006 - ¿Cubren los requisitos la escalada indirecta: un usuario que sube el límite de otro rol y luego se asigna a ese rol (o pide que lo asignen)? [Gap, Spec §FR-002a]
+- [x] CHK007 - ¿Se define si un usuario con permiso de gestionar roles puede crear un rol nuevo con 100 % y asignarlo a sí mismo o a un cómplice? [Gap, Spec §FR-002a, §FR-014]
+- [x] CHK008 - ¿Está definido qué se considera "su propio rol" cuando el rol del usuario cambia durante la sesión (rol de la sesión frente al rol vigente en la base)? [Clarity, Spec §FR-002a, §FR-013]
+- [x] CHK009 - ¿Especifica FR-002a si la restricción aplica también al resto del formulario del propio rol (nombre, permisos) o solo al porcentaje? [Clarity, Spec §FR-002a]
+- [x] CHK010 - ¿Está documentado que el valor del Administrador no se puede alterar por ninguna vía, incluido el envío manipulado del formulario y no solo la interfaz? [Completeness, Spec §FR-005]
+- [x] CHK011 - ¿Se exige que la validación del descuento en la venta ocurra en el servidor, independiente de cualquier aviso en el navegador, y que el monto enviado nunca se tome como ya validado? [Completeness, Spec §FR-006, contracts/formularios.md]
 
 ## Auditoría de rechazos y cambios
 
-- [ ] CHK012 - ¿Están enumerados de forma exhaustiva los datos obligatorios del registro de un intento rechazado (usuario, rol, fecha y hora, subtotal, monto, porcentaje, máximo)? ¿Coinciden entre spec, data-model y contracts? [Consistency, Spec §FR-011, data-model.md]
-- [ ] CHK013 - ¿Se especifica si deben auditarse también los intentos rechazados de cambiar el límite del propio rol o de guardar valores inválidos? [Gap, Spec §FR-002a, §FR-003]
-- [ ] CHK014 - ¿Define la especificación qué debe ocurrir si falla el registro de auditoría de un intento rechazado (por ejemplo, si se muestra igual el mensaje al usuario)? [Gap, Exception Flow, Spec §FR-011]
-- [ ] CHK015 - ¿Es explícito que el registro del intento rechazado debe persistir aunque se deshaga la venta? ¿Está ese requisito en la especificación, y no solo en el plan? [Traceability, Spec §FR-011, §US3]
-- [ ] CHK016 - ¿Se define cómo se distinguen en auditoría los rechazos por límite de rol de los rechazos por las reglas actuales (negativo, mayor que el subtotal)? [Clarity, Spec §US3 escenario 3, §FR-015]
-- [ ] CHK017 - ¿Se especifica si los intentos repetidos deben generar alguna alerta o límite, más allá de un registro por intento? ¿O está excluido explícitamente? [Gap, Spec §Edge Cases]
-- [ ] CHK018 - ¿Está definido que los registros de auditoría no deben incluir datos sensibles del cliente ni detalles del pago? [Gap, Constitución §IV]
-- [ ] CHK019 - ¿El registro de cambio de límite exige el valor anterior y el nuevo también al crear un rol (sin valor anterior)? [Edge Case, Spec §FR-012]
+- [x] CHK012 - ¿Están enumerados de forma exhaustiva los datos obligatorios del registro de un intento rechazado (usuario, rol, fecha y hora, subtotal, monto, porcentaje, máximo)? ¿Coinciden entre spec, data-model y contracts? [Consistency, Spec §FR-011, data-model.md]
+- [x] CHK013 - ¿Se especifica si deben auditarse también los intentos rechazados de cambiar el límite del propio rol o de guardar valores inválidos? [Gap, Spec §FR-002a, §FR-003]
+- [x] CHK014 - ¿Define la especificación qué debe ocurrir si falla el registro de auditoría de un intento rechazado (por ejemplo, si se muestra igual el mensaje al usuario)? [Gap, Exception Flow, Spec §FR-011]
+- [x] CHK015 - ¿Es explícito que el registro del intento rechazado debe persistir aunque se deshaga la venta? ¿Está ese requisito en la especificación, y no solo en el plan? [Traceability, Spec §FR-011, §US3]
+- [x] CHK016 - ¿Se define cómo se distinguen en auditoría los rechazos por límite de rol de los rechazos por las reglas actuales (negativo, mayor que el subtotal)? [Clarity, Spec §US3 escenario 3, §FR-015]
+- [x] CHK017 - ¿Se especifica si los intentos repetidos deben generar alguna alerta o límite, más allá de un registro por intento? ¿O está excluido explícitamente? [Gap, Spec §Edge Cases]
+- [x] CHK018 - ¿Está definido que los registros de auditoría no deben incluir datos sensibles del cliente ni detalles del pago? [Gap, Constitución §IV]
+- [x] CHK019 - ¿El registro de cambio de límite exige el valor anterior y el nuevo también al crear un rol (sin valor anterior)? [Edge Case, Spec §FR-012]
 
 ## Valores límite y cálculo
 
-- [ ] CHK020 - ¿Está definido si un porcentaje con más de dos decimales (por ejemplo, 7,555) se rechaza o se redondea? "Admite hasta dos decimales" es ambiguo. [Ambiguity, Spec §FR-001]
-- [ ] CHK021 - ¿Se especifica cómo se muestra el porcentaje aplicado cuando el redondeo para mostrarlo lo iguala al límite (10,004 % mostrado como "10 %" frente a un máximo de 10 %)? [Gap, Clarity, Spec §FR-008]
-- [ ] CHK022 - ¿Está definida de forma inequívoca la base del cálculo (subtotal antes de impuestos) en los requisitos, y no solo en los supuestos? [Clarity, Spec §FR-006, §Assumptions]
-- [ ] CHK023 - ¿Se define el comportamiento cuando el subtotal es 0 o el carrito solo tiene productos de precio 0? [Edge Case, Gap]
-- [ ] CHK024 - ¿Se especifican los formatos de entrada aceptados (coma o punto decimal, signo de porcentaje, espacios) para el límite? [Clarity, Spec §FR-003]
-- [ ] CHK025 - ¿Son coherentes el límite inclusivo (FR-009) y el ejemplo del borde (10,01 % se rechaza) con los casos de la tabla de contracts/regla-descuento.md? [Consistency, Spec §FR-009, §Edge Cases]
-- [ ] CHK026 - ¿Está definido el tratamiento de un máximo de 0 % frente a 100 % en roles distintos del Administrador? ¿100 % equivale exactamente a "sin límite"? [Clarity, Spec §FR-001, §FR-005]
+- [x] CHK020 - ¿Está definido si un porcentaje con más de dos decimales (por ejemplo, 7,555) se rechaza o se redondea? "Admite hasta dos decimales" es ambiguo. [Ambiguity, Spec §FR-001]
+- [x] CHK021 - ¿Se especifica cómo se muestra el porcentaje aplicado cuando el redondeo para mostrarlo lo iguala al límite (10,004 % mostrado como "10 %" frente a un máximo de 10 %)? [Gap, Clarity, Spec §FR-008]
+- [x] CHK022 - ¿Está definida de forma inequívoca la base del cálculo (subtotal antes de impuestos) en los requisitos, y no solo en los supuestos? [Clarity, Spec §FR-006, §Assumptions]
+- [x] CHK023 - ¿Se define el comportamiento cuando el subtotal es 0 o el carrito solo tiene productos de precio 0? [Edge Case, Gap]
+- [x] CHK024 - ¿Se especifican los formatos de entrada aceptados (coma o punto decimal, signo de porcentaje, espacios) para el límite? [Clarity, Spec §FR-003]
+- [x] CHK025 - ¿Son coherentes el límite inclusivo (FR-009) y el ejemplo del borde (10,01 % se rechaza) con los casos de la tabla de contracts/regla-descuento.md? [Consistency, Spec §FR-009, §Edge Cases]
+- [x] CHK026 - ¿Está definido el tratamiento de un máximo de 0 % frente a 100 % en roles distintos del Administrador? ¿100 % equivale exactamente a "sin límite"? [Clarity, Spec §FR-001, §FR-005]
 
 ## Alcance y cobertura de vías de descuento
 
-- [ ] CHK027 - ¿Se aclara si existen otras vías para aplicar descuento (por ejemplo, descuento por línea del carrito) y si el límite las cubre o quedan prohibidas, ya que los descuentos por producto se declaran fuera de alcance? [Gap, Spec §Assumptions]
-- [ ] CHK028 - ¿Se define si el límite aplica a otras operaciones que alteran el monto cobrado (edición de una venta, devoluciones parciales con reembolso) o están excluidas explícitamente? [Coverage, Spec §Assumptions]
+- [x] CHK027 - ¿Se aclara si existen otras vías para aplicar descuento (por ejemplo, descuento por línea del carrito) y si el límite las cubre o quedan prohibidas, ya que los descuentos por producto se declaran fuera de alcance? [Gap, Spec §Assumptions]
+- [x] CHK028 - ¿Se define si el límite aplica a otras operaciones que alteran el monto cobrado (edición de una venta, devoluciones parciales con reembolso) o están excluidas explícitamente? [Coverage, Spec §Assumptions]
 
 ## Criterios de aceptación y supuestos
 
-- [ ] CHK029 - ¿Es medible SC-005 ("el 90 % entiende su límite") con un método de medición definido? [Measurability, Spec §SC-005]
-- [ ] CHK030 - ¿Está documentado el impacto del valor inicial de 10 % sobre los usuarios que hoy dan descuentos mayores, con algún requisito de comunicación o transición? [Assumption, Spec §Clarifications Q1, §FR-014]
-- [ ] CHK031 - ¿Hay un requisito sobre el comportamiento cuando un rol todavía no tiene un valor configurado (por ejemplo, antes de aplicar el script de actualización)? [Gap, Dependency, Spec §FR-014]
+- [x] CHK029 - ¿Es medible SC-005 ("el 90 % entiende su límite") con un método de medición definido? [Measurability, Spec §SC-005]
+- [x] CHK030 - ¿Está documentado el impacto del valor inicial de 10 % sobre los usuarios que hoy dan descuentos mayores, con algún requisito de comunicación o transición? [Assumption, Spec §Clarifications Q1, §FR-014]
+- [x] CHK031 - ¿Hay un requisito sobre el comportamiento cuando un rol todavía no tiene un valor configurado (por ejemplo, antes de aplicar el script de actualización)? [Gap, Dependency, Spec §FR-014]
 
 ## Notes
 

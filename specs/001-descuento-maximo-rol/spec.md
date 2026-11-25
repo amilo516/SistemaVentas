@@ -115,6 +115,12 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
 - **Rol Administrador**: sin límite y no modificable (ver FR-005).
 - **Rol con máximo 0 %**: cualquier descuento mayor que cero se rechaza; las ventas sin
   descuento funcionan normalmente.
+- **Rol con máximo 100 %** (distinto del Administrador): permite cualquier descuento hasta el
+  subtotal, que ya es el tope de la regla existente (FR-015); en la práctica equivale a no tener
+  límite. El Administrador sigue siendo el único rol sin límite por definición y no modificable.
+- **Subtotal 0**: un carrito vacío ya se rechaza antes. Con subtotal 0, cualquier descuento mayor
+  que 0 lo rechaza la regla "no mayor que el subtotal" (FR-015), y no cuenta como descuento
+  excesivo.
 - **Valor inicial de los roles existentes y de los roles nuevos**: al activar la funcionalidad,
   todos los roles existentes distintos del Administrador quedan con un máximo de 10 %, y cada
   rol nuevo se crea con 10 % salvo que el administrador indique otro valor al crearlo. Un usuario
@@ -129,7 +135,13 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
   en el momento en que confirma la venta.
 - **Reglas actuales de descuento**: se mantienen (no negativo y no mayor que el subtotal); un
   descuento rechazado por esas reglas no se registra como intento de descuento excesivo.
-- **Intentos repetidos**: cada intento rechazado genera su propio registro de auditoría.
+- **Intentos repetidos**: cada intento rechazado genera su propio registro de auditoría. Las
+  alertas, avisos o bloqueos por intentos repetidos quedan fuera del alcance de esta
+  funcionalidad; el administrador los detecta revisando la auditoría.
+- **Rol desactivado o permiso retirado con una venta en curso**: al confirmar la venta se vuelven
+  a comprobar los permisos. Si el usuario fue desactivado, se cierra su sesión. Si perdió el
+  permiso de crear ventas, recibe "Acceso denegado". En ambos casos la venta no se registra. Un
+  rol con usuarios activos no se puede desactivar.
 
 ## Requirements *(mandatory)*
 
@@ -138,18 +150,26 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
 - **FR-001**: Cada rol MUST tener un porcentaje máximo de descuento, con valores de 0 a 100 y
   hasta dos decimales.
 - **FR-002**: Solo los usuarios con el permiso "Gestionar roles y permisos" MUST poder consultar
-  y modificar el porcentaje máximo en la gestión de roles; la verificación MUST hacerse en el servidor en cada solicitud.
+  y modificar el porcentaje máximo en la gestión de roles, tanto al crear un rol como al editarlo;
+  la verificación MUST hacerse en el servidor en cada solicitud.
 - **FR-002a**: Un usuario MUST NOT poder modificar el porcentaje máximo de su propio rol, salvo
   que sea Administrador; el intento MUST rechazarse con un mensaje claro, sin cambiar el valor,
-  y MUST registrarse en la auditoría.
+  y MUST registrarse en la auditoría. Al rechazarse, MUST NOT guardarse nada del formulario
+  (tampoco el nombre, la descripción ni los permisos). "Propio rol" es el rol que el usuario
+  tiene asignado en el momento de guardar; si un administrador se lo cambió, se considera el
+  nuevo desde su siguiente acción.
 - **FR-003**: El sistema MUST rechazar valores fuera del rango 0–100, no numéricos o con más de
-  dos decimales (acepta coma o punto decimal), mostrando un mensaje claro y conservando el valor
-  anterior.
+  dos decimales, mostrando un mensaje claro y conservando el valor anterior. Acepta coma o punto
+  decimal y espacios alrededor del número; MUST rechazar el signo de porcentaje (`10 %`) y los
+  separadores de miles (`1.000,5`). Estos valores inválidos son errores de escritura, no intentos
+  de acceso, así que MUST NOT registrarse en la auditoría.
 - **FR-004**: El listado de roles MUST mostrar el porcentaje máximo vigente de cada rol.
 - **FR-005**: El rol Administrador MUST tener siempre descuento ilimitado (100 %) y su valor
   MUST NOT poder modificarse.
 - **FR-006**: Al confirmar una venta, el sistema MUST calcular el porcentaje del descuento sobre
-  el subtotal de la venta y compararlo con el máximo vigente del rol del usuario que la registra.
+  el subtotal de la venta antes de impuestos y compararlo con el máximo vigente del rol del
+  usuario que la registra. Solo pueden confirmar una venta los usuarios con el permiso existente
+  para crear ventas; la regla aplica a todos ellos, salvo al Administrador (FR-005).
 - **FR-007**: Si el porcentaje del descuento supera el máximo del rol, el sistema MUST NOT
   registrar la venta y MUST NOT afectar el stock, la caja ni el carrito.
 - **FR-008**: Al rechazar la venta, el sistema MUST mostrar un mensaje que indique el porcentaje
@@ -165,7 +185,8 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
   auditoría falla, la venta MUST NOT registrarse igualmente, el usuario MUST ver el mensaje del
   límite y el fallo MUST quedar en el log de errores del servidor.
 - **FR-012**: Cada cambio del porcentaje máximo de un rol MUST registrarse en la auditoría con
-  el rol, el valor anterior, el valor nuevo y el usuario que lo cambió.
+  el rol, el valor anterior, el valor nuevo y el usuario que lo cambió. Al crear un rol no hay
+  valor anterior: su valor inicial MUST quedar en el registro de creación del rol.
 - **FR-013**: Los cambios del porcentaje máximo o del rol de un usuario MUST aplicarse a partir
   de la siguiente venta, sin necesidad de que el usuario cierre e inicie sesión.
 - **FR-014**: Al activar la funcionalidad, todos los roles existentes excepto el Administrador
@@ -173,6 +194,9 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
   administrador puede cambiarlo al crearlos o después.
 - **FR-015**: Las reglas actuales de descuento (no negativo, no mayor que el subtotal) MUST
   mantenerse sin cambios.
+- **FR-016**: Los registros de auditoría de esta funcionalidad MUST NOT incluir datos del cliente
+  (nombre, documento) ni del pago (método, referencia, dinero recibido); solo el usuario, el rol,
+  los importes de la venta y los porcentajes.
 
 ### Key Entities
 
@@ -220,4 +244,14 @@ módulo de ventas; debe aparecer el intento con todos sus datos.
   permitido a quien tiene "Gestionar roles y permisos".
 - El sistema no aplica hoy descuentos por línea del carrito (el dato existe en la estructura,
   pero ninguna pantalla lo usa); si se habilitan en el futuro, deberán someterse a este límite.
+- Permisos del propio rol: quien tiene "Gestionar roles y permisos" puede editar los permisos de
+  su propio rol (regla existente de la gestión de roles). Se acepta como riesgo, igual que la
+  escalada indirecta, y no se bloquea: cada cambio de permisos queda auditado con los permisos
+  agregados y quitados.
+- Usuarios que hoy dan descuentos mayores al 10 %: no se incluye aviso ni transición. El
+  administrador debe ajustar los límites de los roles antes de aplicar el script o justo
+  después; hasta entonces, esos descuentos se rechazan.
+- El script de actualización es requisito previo: antes de aplicarlo no existe el valor del
+  límite, y las pantallas de venta y de roles muestran un error de base de datos. No se contempla
+  que el sistema funcione sin él.
 - Depende de la gestión de roles, del registro de ventas y del módulo de auditoría existentes.
