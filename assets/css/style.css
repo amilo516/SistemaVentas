@@ -231,6 +231,16 @@ td.acciones{white-space:nowrap}td.acciones>*{margin-left:4px}td.acciones .btn-sm
 .card,.pos-main,.stack{min-width:0}.pos-main{grid-template-columns:minmax(0,1fr)}.reporte-card{overflow-x:auto}.tabs{max-width:100%}
 /* Dashboard: últimas ventas y más vendidos */
 .dash-paneles{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+/* Panel "Stock bajo" del dashboard: nombres largos pasan de línea, sin desplazamiento horizontal; los agotados
+   llevan el texto "Agotado" (badge) además del color. */
+.panel-stock-bajo{margin-top:16px}
+.lista-stock{list-style:none;margin:0;padding:0}
+.lista-stock li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;padding:10px 6px;min-width:0}
+.lista-stock li+li{border-top:1px solid #f0f1f3}
+.lista-stock .ls-nombre{min-width:0;overflow-wrap:anywhere;font-weight:600}
+.lista-stock .ls-nombre a{color:inherit}
+.lista-stock .ls-cantidades{color:#4b5563;font-size:14px;font-variant-numeric:tabular-nums}
+.lista-stock li.agotado .ls-cantidades{color:#b91c1c}
 .dash-paneles .card-header{margin-bottom:12px}.dash-paneles .card-header h2{margin:0;font-size:17px}
 .enlace-sec{font-size:13px;color:var(--accent);text-decoration:none;font-weight:600;white-space:nowrap}
 .lista-ventas{list-style:none;margin:0;padding:0}

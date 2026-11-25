@@ -4,6 +4,8 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/constantes.php';
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../helpers/permisos.php';
+require_once __DIR__ . '/../helpers/productos.php';
+require_once __DIR__ . '/../models/Producto.php';
 
 class DashboardController {
     private PDO $db;
@@ -51,6 +53,22 @@ class DashboardController {
             INNER JOIN productos p ON p.id_producto=dv.id_producto
             WHERE v.estado<>'anulada' AND v.fecha_venta >= DATE_FORMAT(CURDATE(),'%Y-%m-01')
             GROUP BY p.id_producto,p.nombre,p.unidad_medida ORDER BY total DESC LIMIT 5");
+    }
+
+    // Panel "Stock bajo": los $max productos activos en alerta más críticos y el total en alerta.
+    // Reutiliza la regla y la consulta de stock bajo de Producto (la misma que la vista "Stock bajo").
+    // Pide todos los que están en alerta (no solo 500) para no dejar fuera a los más críticos.
+    // Devuelve null si la consulta falla, para que solo este panel muestre "Sin datos disponibles".
+    public function stockBajo(int $max=10): ?array {
+        try {
+            $productos=new Producto($this->db);
+            $total=(int)($productos->resumenStock()['bajos'] ?? 0);
+            $lista=$total>0 ? $productos->listar(['estado'=>'1','stock_bajo'=>true,'limite'=>max(500,$total)]) : [];
+            return ['productos'=>array_slice(ordenarPorCriticidad($lista),0,$max),'total'=>$total];
+        } catch (PDOException $e) {
+            error_log('Dashboard: ' . $e->getMessage());
+            return null;
+        }
     }
 
     private function consultarVarias(string $sql, array $params=[]): array {

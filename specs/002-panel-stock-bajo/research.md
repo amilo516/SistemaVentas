@@ -32,8 +32,9 @@ Fase 0. El contexto técnico no tenía puntos sin resolver; aquí quedan las dec
   2. Dentro de los agotados: por `stock` ascendente (un negativo va antes que 0).
   3. Dentro del resto: por proporción `stock / stock_minimo` ascendente. Sin división por cero: el
      resto solo contiene filas con `stock > 0` y `stock <= stock_minimo`, así que `stock_minimo > 0`.
-  4. Desempate: `nombre`, sin distinguir mayúsculas ni tildes (`strcoll`/`mb_strtolower`), y por
-     último `id_producto` para que el orden sea estable.
+  4. Desempate: `nombre`, sin distinguir mayúsculas (`mb_strtolower` y comparación de texto); las
+     tildes y los números se comparan como texto (spec.md FR-004), así que no se necesita la
+     extensión `intl`. Por último, `id_producto` (orden de alta) para que el orden sea estable.
 - **Rationale**: la regla se prueba sin base de datos (Principio V) y no depende de la consulta.
 - **Comparación de proporciones**: se compara `stockA × mínimoB` con `stockB × mínimoA`
   (multiplicación cruzada) en lugar de dividir, para evitar errores de coma flotante en empates

@@ -12,7 +12,7 @@ if (getenv('DB_NAME') !== 'sistema_ventas_test') {
 $p = json_decode((string)base64_decode($argv[1] ?? '', true), true, 512, JSON_THROW_ON_ERROR);
 $raiz = dirname(__DIR__, 2) . '/..';
 $vista = (string)$p['vista'];
-if (!preg_match('#^views/[a-z_]+/[a-z_]+\.php$#', $vista)) {
+if (!preg_match('#^(views/[a-z_]+/[a-z_]+\.php|public/dashboard\.php)$#', $vista)) {
     fwrite(STDERR, "Vista no permitida: {$vista}\n");
     exit(2);
 }

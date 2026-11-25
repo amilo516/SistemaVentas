@@ -2,8 +2,10 @@
 class Producto {
     public function __construct(private PDO $db) {}
 
-    // Filtros: q (nombre/código/código de barras), categoria, estado ('1','0' o ''), stock_bajo (bool).
+    // Filtros: q (nombre/código/código de barras), categoria, estado ('1','0' o ''), stock_bajo (bool),
+    // limite (máximo de filas; entero, mínimo 1, por defecto 500).
     public function listar(array $f=[]): array {
+        $limite=array_key_exists('limite',$f) ? max(1,(int)$f['limite']) : 500;
         $where=['1=1']; $p=[];
         if (($f['q'] ?? '')!=='') {
             $where[]='(p.nombre LIKE :q1 OR p.codigo LIKE :q2 OR p.codigo_barras LIKE :q3)';
@@ -14,7 +16,7 @@ class Producto {
         if (!empty($f['stock_bajo'])) $where[]='p.stock<=p.stock_minimo';
         $s=$this->db->prepare("SELECT p.*,c.nombre categoria FROM productos p
             INNER JOIN categorias c ON c.id_categoria=p.id_categoria
-            WHERE ".implode(' AND ',$where)." ORDER BY p.estado DESC, p.nombre LIMIT 500");
+            WHERE ".implode(' AND ',$where)." ORDER BY p.estado DESC, p.nombre LIMIT {$limite}");
         $s->execute($p);
         return $s->fetchAll();
     }

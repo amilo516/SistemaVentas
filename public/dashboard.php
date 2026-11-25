@@ -8,6 +8,7 @@ require_once __DIR__ . '/../controllers/DashboardController.php';
 requirePermission('dashboard.ver');
 $titulo = 'Dashboard';
 $ultimas = $topMes = [];
+$stockBajo = null; // null = sin datos (el panel lo indica)
 try {
     $dash = new DashboardController();
     $resumen = $dash->resumen();
@@ -15,6 +16,7 @@ try {
         $ultimas = $dash->ultimasVentas();
         $topMes = $dash->masVendidosMes();
     }
+    if (tienePermiso('productos.ver')) $stockBajo = $dash->stockBajo();
 } catch (PDOException $e) {
     error_log('Dashboard: ' . $e->getMessage());
     $resumen = ['ventas' => null, 'cajas' => null, 'devoluciones' => null];
@@ -95,5 +97,29 @@ require __DIR__ . '/../views/layouts/header.php';
   </section>
 </div>
 <script src="<?= APP_URL ?>/assets/js/reportes.js?v=<?= filemtime(__DIR__ . '/../assets/js/reportes.js') ?>" defer></script>
+<?php endif; ?>
+
+<?php if (tienePermiso('productos.ver')): // Panel "Stock bajo": después de los paneles existentes (FR-001) ?>
+<section class="card panel-stock-bajo" id="panel-stock-bajo">
+  <div class="card-header">
+    <h2>Stock bajo</h2>
+    <?php if ($stockBajo && $stockBajo['total'] > 10): ?><a class="enlace-sec" href="<?= APP_URL ?>/views/productos/stock.php">Ver todos (<?= (int)$stockBajo['total'] ?>) →</a><?php endif; ?>
+  </div>
+  <?php if ($stockBajo === null): ?>
+    <div class="vacio-panel"><?= icono('productos') ?><p>Sin datos disponibles</p></div>
+  <?php elseif (!$stockBajo['productos']): ?>
+    <div class="vacio-panel"><?= icono('productos') ?><p>No hay productos con stock bajo.</p></div>
+  <?php else: ?>
+    <?php $puedeEditar = tienePermiso('productos.editar'); // el enlace solo para quien puede editar (FR-007) ?>
+    <ul class="lista-stock">
+      <?php foreach ($stockBajo['productos'] as $p): $agotado = (float)$p['stock'] <= 0; ?>
+        <li class="<?= $agotado ? 'agotado' : '' ?>">
+          <span class="ls-nombre"><?php if ($puedeEditar): ?><a href="<?= APP_URL ?>/views/productos/editar.php?id=<?= (int)$p['id_producto'] ?>"><?= e($p['nombre']) ?></a><?php else: ?><?= e($p['nombre']) ?><?php endif; ?><?php if ($agotado): ?> <span class="badge badge-danger">Agotado</span><?php endif; ?></span>
+          <span class="ls-cantidades">Stock: <?= e(cantidad($p['stock']) . ' ' . $p['unidad_medida']) ?> · Mínimo: <?= e(cantidad($p['stock_minimo']) . ' ' . $p['unidad_medida']) ?></span>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php endif; ?>
+</section>
 <?php endif; ?>
 <?php require __DIR__ . '/../views/layouts/footer.php'; ?>
